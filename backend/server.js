@@ -28,6 +28,7 @@ app.use(limiter);
 // ── CORS ───────────────────────────────────────────────────────────────────────
 const allowedOrigins = [
   process.env.FRONTEND_URL,
+  'https://clever-kangaroo-414558.netlify.app',
   'http://localhost:3000',
   'http://localhost:5173'
 ].filter(Boolean);
