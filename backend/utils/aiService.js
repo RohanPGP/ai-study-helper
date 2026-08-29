@@ -81,6 +81,8 @@ Generate a JSON response with EXACTLY this structure (no markdown, no code block
 }
 
 Requirements:
+Formatting rules:
+- Do NOT use LaTeX notation or backslash commands (no \frac, \sqrt, \tan, \times, etc.). Write math using plain text or unicode symbols instead (e.g. √, π, ², ½, ×, ÷).
 - Summary: 3-4 substantial paragraphs covering all main topics
 - Key points: exactly 8 most important takeaways
 - Flashcards: exactly 10 question-answer pairs covering key vocabulary and concepts
@@ -91,7 +93,7 @@ Return ONLY the JSON object, no other text.`;
   const raw = await callAI(prompt, 4096);
   const stripped = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
   // Fix stray backslashes from math notation (e.g. \sqrt, \frac) that aren't valid JSON escapes
-  const clean = stripped.replace(/\\(?!["\\/bfnrtu])/g, '\\\\');
+  const clean = stripped.replace(/\\(?!["\\n])/g, '\\\\');
 
   try {
     return JSON.parse(clean);
