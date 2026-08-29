@@ -24,14 +24,9 @@ const protect = async (req, res, next) => {
   }
 };
 
+// Payments disabled for now — delete this early return to re-enable the subscription gate.
 const requireSubscription = (req, res, next) => {
-  if (!req.user.hasActiveSubscription()) {
-    return res.status(403).json({
-      error: 'Active subscription required',
-      code: 'SUBSCRIPTION_REQUIRED'
-    });
-  }
-  next();
+  return next();
 };
 
 module.exports = { protect, requireSubscription };
