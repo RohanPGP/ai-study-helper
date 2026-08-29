@@ -1,12 +1,9 @@
 const https = require('https');
 
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
-const MODEL = 'claude-sonnet-4-6';
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const MODEL = 'llama-3.3-70b-versatile';
 
-/**
- * Call the Anthropic messages API
- */
-async function callClaude(prompt, maxTokens = 4096) {
+async function callAI(prompt, maxTokens = 4096) {
   return new Promise((resolve, reject) => {
     const body = JSON.stringify({
       model: MODEL,
@@ -15,13 +12,12 @@ async function callClaude(prompt, maxTokens = 4096) {
     });
 
     const options = {
-      hostname: 'api.anthropic.com',
-      path: '/v1/messages',
+      hostname: 'api.groq.com',
+      path: '/openai/v1/chat/completions',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
         'Content-Length': Buffer.byteLength(body)
       }
     };
@@ -33,7 +29,7 @@ async function callClaude(prompt, maxTokens = 4096) {
         try {
           const parsed = JSON.parse(data);
           if (parsed.error) return reject(new Error(parsed.error.message));
-          const text = parsed.content?.[0]?.text || '';
+          const text = parsed.choices?.[0]?.message?.content || '';
           resolve(text);
         } catch (e) {
           reject(new Error('Failed to parse AI response'));
@@ -47,11 +43,8 @@ async function callClaude(prompt, maxTokens = 4096) {
   });
 }
 
-/**
- * Generate a complete study pack from extracted text
- */
 async function generateStudyPack(text, title) {
-  const truncated = text.slice(0, 12000); // stay within token limits
+  const truncated = text.slice(0, 12000);
 
   const prompt = `You are an expert educational assistant. Analyze the following study material and generate a comprehensive study pack.
 
@@ -74,14 +67,8 @@ Generate a JSON response with EXACTLY this structure (no markdown, no code block
     "Key point 8"
   ],
   "flashcards": [
-    {
-      "question": "Question about a key concept?",
-      "answer": "Clear, concise answer"
-    },
-    {
-      "question": "Another concept question?",
-      "answer": "Another answer"
-    }
+    { "question": "Question about a key concept?", "answer": "Clear, concise answer" },
+    { "question": "Another concept question?", "answer": "Another answer" }
   ],
   "quiz": [
     {
@@ -101,15 +88,12 @@ Requirements:
 
 Return ONLY the JSON object, no other text.`;
 
-  const raw = await callClaude(prompt, 4096);
-
-  // Strip any accidental markdown fences
+  const raw = await callAI(prompt, 4096);
   const clean = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
 
   try {
     return JSON.parse(clean);
   } catch (e) {
-    // Attempt to extract JSON from response
     const match = clean.match(/\{[\s\S]*\}/);
     if (match) return JSON.parse(match[0]);
     throw new Error('AI returned invalid JSON structure');
