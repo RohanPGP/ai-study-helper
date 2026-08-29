@@ -101,10 +101,8 @@ function Quiz({ questions }) {
         border: answers[qi] === oi ? '1.5px solid var(--indigo-500)' : '1.5px solid var(--gray-200)'
       };
     }
-    if (oi === questions[qi].correctIndex) return { ...base, background: '#d1fae5', border: '1.5px solid #6ee7b7', color: '#065f46', fontWeight: 600 };
-    if (answers[qi] === oi) return { ...base, background: '#fee2e2', border: '1.5px solid #fca5a5', color: '#b91c1c' };
-    return { ...base, background: 'var(--gray-50)', border: '1.5px solid var(--gray-200)', color: 'var(--gray-400)' };
-  };
+    if (oi === questions[qi].correctIndex) return { ...base, background: 'rgba(16,185,129,0.15)', border: '1.5px solid #10b981', color: '#34d399', fontWeight: 600 };
+if (answers[qi] === oi) return { ...base, background: 'rgba(239,68,68,0.15)', border: '1.5px solid #ef4444', color: '#f87171' };
 
   return (
     <div className="card">
