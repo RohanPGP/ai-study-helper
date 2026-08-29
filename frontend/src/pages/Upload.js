@@ -84,7 +84,7 @@ export default function Upload() {
             onClick={() => inputRef.current.click()}
             style={{
               border: `2px dashed ${dragging ? 'var(--indigo-500)' : file ? 'var(--emerald-500)' : 'var(--gray-200)'}`,
-              background: dragging ? 'var(--indigo-50)' : file ? '#f0fdf4' : 'var(--white)',
+              background: dragging ? 'var(--indigo-50)' : file ? '#0a2818' : 'var(--white)',
               textAlign: 'center',
               cursor: 'pointer',
               padding: '48px 24px',
