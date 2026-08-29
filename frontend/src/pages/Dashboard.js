@@ -10,12 +10,11 @@ const statusBadge = (status) => ({
 }[status] || null);
 
 export default function Dashboard() {
-  const { user, refreshUser } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [packs, setPacks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(null);
-  const [portalLoading, setPortalLoading] = useState(false);
 
   const loadPacks = useCallback(async () => {
     try {
@@ -51,20 +50,6 @@ export default function Dashboard() {
     }
   };
 
-  const openPortal = async () => {
-    setPortalLoading(true);
-    try {
-      const { url } = await api.createPortal();
-      window.location.href = url;
-    } catch (err) {
-      alert(err.message);
-    } finally {
-      setPortalLoading(false);
-    }
-  };
-
-  const isActive = user?.hasActiveSubscription;
-
   return (
     <div className="page">
       <div className="container">
@@ -72,40 +57,11 @@ export default function Dashboard() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
           <div>
             <h1 style={{ fontSize: 28, fontWeight: 800 }}>Welcome back, {user?.name?.split(' ')[0]} 👋</h1>
-            <p style={{ color: 'var(--gray-500)', marginTop: 4 }}>
-              Subscription:{' '}
-              {isActive
-                ? <span className="badge badge-active">Active</span>
-                : <span className="badge badge-inactive">Inactive</span>}
-            </p>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
-            {isActive && (
-              <Link to="/upload" className="btn btn-primary">+ Upload Homework</Link>
-            )}
-            <button onClick={openPortal} className="btn btn-ghost" disabled={portalLoading}>
-              {portalLoading ? '…' : '⚙ Manage Billing'}
-            </button>
+            <Link to="/upload" className="btn btn-primary">+ Upload Homework</Link>
           </div>
         </div>
-
-        {/* No subscription CTA */}
-        {!isActive && (
-          <div className="card" style={{
-            background: 'linear-gradient(135deg, #eef2ff, #ede9fe)',
-            border: '1px solid var(--indigo-100)',
-            textAlign: 'center',
-            marginBottom: 32,
-            padding: 40
-          }}>
-            <div style={{ fontSize: 44, marginBottom: 12 }}>🎓</div>
-            <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Activate your subscription</h2>
-            <p style={{ color: 'var(--gray-500)', marginBottom: 20 }}>
-              For just $5/month, turn any homework into summaries, flashcards, and quizzes.
-            </p>
-            <Link to="/payment" className="btn btn-primary btn-lg">Subscribe for $5/month →</Link>
-          </div>
-        )}
 
         {/* Study packs */}
         <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>Your Study Packs</h2>
@@ -116,11 +72,9 @@ export default function Dashboard() {
           <div className="card" style={{ textAlign: 'center', padding: 60, color: 'var(--gray-500)' }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>📂</div>
             <p style={{ fontSize: 16, fontWeight: 500 }}>No study packs yet.</p>
-            {isActive && (
-              <Link to="/upload" className="btn btn-primary" style={{ marginTop: 16 }}>
-                Upload your first file
-              </Link>
-            )}
+            <Link to="/upload" className="btn btn-primary" style={{ marginTop: 16 }}>
+              Upload your first file
+            </Link>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
