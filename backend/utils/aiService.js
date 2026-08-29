@@ -89,7 +89,9 @@ Requirements:
 Return ONLY the JSON object, no other text.`;
 
   const raw = await callAI(prompt, 4096);
-  const clean = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+  const stripped = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+  // Fix stray backslashes from math notation (e.g. \sqrt, \frac) that aren't valid JSON escapes
+  const clean = stripped.replace(/\\(?!["\\/bfnrtu])/g, '\\\\');
 
   try {
     return JSON.parse(clean);
