@@ -15,7 +15,7 @@ export default function Home() {
       <section style={{ background: 'linear-gradient(135deg, #100f1e 0%, #1a1030 100%)', padding: '80px 0' }}>
         <div className="container" style={{ textAlign: 'center' }}>
           <div style={{ display: 'inline-block', background: 'var(--white)', border: '1px solid var(--indigo-200)', borderRadius: 999, padding: '5px 16px', fontSize: 13, fontWeight: 600, color: 'var(--indigo-500)', marginBottom: 24 }}>
-            🤖 Powered by AI
+            Made By Rohan Sharma
           </div>
           <h1 style={{ fontSize: 'clamp(32px, 6vw, 60px)', fontWeight: 900, lineHeight: 1.15, marginBottom: 20, color: 'var(--gray-900)' }}>
             Turn Homework Into<br />
