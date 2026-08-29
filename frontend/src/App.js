@@ -5,7 +5,6 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import Payment from './pages/Payment';
 import Dashboard from './pages/Dashboard';
 import Upload from './pages/Upload';
 import StudyPackView from './pages/StudyPackView';
@@ -24,14 +23,12 @@ function AppRoutes() {
         <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
         <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <Signup />} />
 
-        <Route path="/payment" element={
-          <ProtectedRoute><Payment /></ProtectedRoute>
-        } />
+        <Route path="/payment" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={
           <ProtectedRoute><Dashboard /></ProtectedRoute>
         } />
         <Route path="/upload" element={
-          <ProtectedRoute requireSub><Upload /></ProtectedRoute>
+          <ProtectedRoute><Upload /></ProtectedRoute>
         } />
         <Route path="/study-pack/:id" element={
           <ProtectedRoute><StudyPackView /></ProtectedRoute>
