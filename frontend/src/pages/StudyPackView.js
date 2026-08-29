@@ -1,4 +1,4 @@
-$ cat << 'ENDOFFILE'
+cat << 'ENDOFFILE'
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../utils/api';
@@ -243,7 +243,6 @@ export default function StudyPackView() {
   );
 }
 ENDOFFILE
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../utils/api';
