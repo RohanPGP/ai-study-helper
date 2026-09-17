@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 
 export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -16,7 +17,7 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      const user = await login(form.email, form.password);
+      const user = await login(form.email, form.password, rememberMe);
       navigate(user.hasActiveSubscription ? from : '/payment', { replace: true });
     } catch (err) {
       setError(err.message);
@@ -61,6 +62,16 @@ export default function Login() {
                 required
               />
             </div>
+
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--gray-700)', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={e => setRememberMe(e.target.checked)}
+                style={{ width: 16, height: 16, accentColor: 'var(--indigo-600)' }}
+              />
+              Stay logged in on this device for 15 days
+            </label>
 
             <button className="btn btn-primary btn-lg" type="submit" disabled={loading} style={{ marginTop: 4 }}>
               {loading ? 'Signing in…' : 'Sign In'}
