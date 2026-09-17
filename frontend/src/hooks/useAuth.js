@@ -22,13 +22,13 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => { loadUser(); }, [loadUser]);
 
-  const login = async (email, password) => {
-    const data = await api.login({ email, password });
+    const login = async (email, password, rememberMe) => {
+    const data = await api.login({ email, password, rememberMe });
     localStorage.setItem('token', data.token);
     setUser(data.user);
     return data.user;
   };
-
+  
   const signup = async (name, email, password) => {
     const data = await api.signup({ name, email, password });
     localStorage.setItem('token', data.token);
