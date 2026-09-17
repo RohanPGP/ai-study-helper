@@ -3,10 +3,10 @@ export default function About() {
     <div className="page">
       <div className="container" style={{ maxWidth: 640 }}>
         <div className="card">
-          <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16 }}>About AI Study Helper</h1>
+          <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16 }}>About Tutor Pulse AI</h1>
 
           <p style={{ color: 'var(--gray-700)', lineHeight: 1.8, marginBottom: 24 }}>
-            AI Study Helper turns any homework file — a PDF, Word doc, or text file — into a
+            Tutor Pulse AI turns any homework file — a PDF, Word doc, or text file — into a
             complete study pack in seconds. Upload your material and get an AI-generated summary,
             key points, flashcards, and a quiz, all built to help you study smarter and review faster.
           </p>
