@@ -11,7 +11,7 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="container navbar-inner">
         <Link to={user ? '/dashboard' : '/'} className="navbar-brand">
-          📚 AI Study Helper
+          📚 Tutor Pulse AI
         </Link>
 
         <div className="navbar-links">
