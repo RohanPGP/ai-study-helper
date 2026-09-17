@@ -3,8 +3,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
 
-const signToken = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
+const signToken = (id, expiresIn) =>
+  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: expiresIn || process.env.JWT_EXPIRES_IN || '7d' });
 
 // POST /auth/signup
 router.post('/signup', async (req, res) => {
@@ -37,7 +37,7 @@ router.post('/signup', async (req, res) => {
 // POST /auth/login
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, rememberMe } = req.body;
     if (!email || !password)
       return res.status(400).json({ error: 'Email and password are required' });
 
@@ -45,7 +45,7 @@ router.post('/login', async (req, res) => {
     if (!user || !(await user.comparePassword(password)))
       return res.status(401).json({ error: 'Invalid email or password' });
 
-    const token = signToken(user._id);
+    const token = signToken(user._id, rememberMe ? '15d' : '1d');
 
     res.json({
       token,
