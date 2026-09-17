@@ -20,10 +20,12 @@ export default function Navbar() {
             <>
               <Link to="/dashboard" className="btn btn-ghost btn-sm">Dashboard</Link>
               <Link to="/upload" className="btn btn-ghost btn-sm">Upload</Link>
+              <Link to="/tools" className="btn btn-ghost btn-sm">Tools</Link>
               <button onClick={handleLogout} className="btn btn-ghost btn-sm">Logout</button>
             </>
           ) : (
             <>
+              <Link to="/tools" className="btn btn-ghost btn-sm">Tools</Link>
               <Link to="/login" className="btn btn-ghost btn-sm">Login</Link>
               <Link to="/signup" className="btn btn-primary btn-sm">Get Started</Link>
             </>
