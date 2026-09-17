@@ -6,7 +6,11 @@
     </linearGradient>
   </defs>
   <rect width="40" height="40" rx="9" fill="url(#g)"/>
-  <polygon points="28.6,20 24.3,12.6 15.7,12.6 11.4,20 15.7,27.4 24.3,27.4" fill="#ffffff"/>
-  <line x1="20" y1="20" x2="24.3" y2="12.6" stroke="#4f46e5" stroke-width="1.5"/>
-  <line x1="20" y1="20" x2="15.7" y2="27.4" stroke="#4f46e5" stroke-width="1.5"/>
+  <polygon points="33,20 26.5,8.73 13.5,8.73 7,20 13.5,31.27 26.5,31.27" fill="#ffffff"/>
+  <line x1="20" y1="20" x2="33" y2="20" stroke="#4f46e5" stroke-width="1.8"/>
+  <line x1="20" y1="20" x2="26.5" y2="8.73" stroke="#4f46e5" stroke-width="1.8"/>
+  <line x1="20" y1="20" x2="13.5" y2="8.73" stroke="#4f46e5" stroke-width="1.8"/>
+  <line x1="20" y1="20" x2="7" y2="20" stroke="#4f46e5" stroke-width="1.8"/>
+  <line x1="20" y1="20" x2="13.5" y2="31.27" stroke="#4f46e5" stroke-width="1.8"/>
+  <line x1="20" y1="20" x2="26.5" y2="31.27" stroke="#4f46e5" stroke-width="1.8"/>
 </svg>
