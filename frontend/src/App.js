@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import Upload from './pages/Upload';
 import StudyPackView from './pages/StudyPackView';
 import About from './pages/About';
+import Tools from './pages/Tools';
 import './styles/global.css';
 
 function AppRoutes() {
