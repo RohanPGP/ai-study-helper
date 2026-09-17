@@ -10,8 +10,9 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="container navbar-inner">
-        <Link to={user ? '/dashboard' : '/'} className="navbar-brand">
-          📚 Tutor Pulse AI
+        <Link to={user ? '/dashboard' : '/'} className="navbar-brand" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <img src="/logo.svg" alt="" width={28} height={28} />
+          TutorPulseAI
         </Link>
 
         <div className="navbar-links">
