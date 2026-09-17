@@ -1,0 +1,465 @@
+$ cat << 'ENDOFFILE'
+import { useState } from 'react';
+
+const GRADE_POINTS = {
+  'A+': 4.0, 'A': 4.0, 'A-': 3.7,
+  'B+': 3.3, 'B': 3.0, 'B-': 2.7,
+  'C+': 2.3, 'C': 2.0, 'C-': 1.7,
+  'D+': 1.3, 'D': 1.0, 'D-': 0.7,
+  'F': 0.0
+};
+
+function GradeCalculator() {
+  const [rows, setRows] = useState([
+    { name: '', grade: '', weight: '' },
+    { name: '', grade: '', weight: '' },
+    { name: '', grade: '', weight: '' }
+  ]);
+  const [currentGrade, setCurrentGrade] = useState(null);
+
+  const [goalGrade, setGoalGrade] = useState('');
+  const [finalCurrent, setFinalCurrent] = useState('');
+  const [finalWeight, setFinalWeight] = useState('');
+  const [finalResult, setFinalResult] = useState(null);
+
+  const updateRow = (i, field, value) => {
+    setRows(rs => rs.map((r, idx) => idx === i ? { ...r, [field]: value } : r));
+  };
+
+  const addRow = () => setRows(rs => [...rs, { name: '', grade: '', weight: '' }]);
+
+  const calculateGrade = () => {
+    let weightedSum = 0, weightTotal = 0;
+    rows.forEach(r => {
+      const g = parseFloat(r.grade), w = parseFloat(r.weight);
+      if (!isNaN(g) && !isNaN(w) && w > 0) {
+        weightedSum += g * w;
+        weightTotal += w;
+      }
+    });
+    if (weightTotal === 0) { setCurrentGrade('no-data'); return; }
+    const result = weightedSum / weightTotal;
+    setCurrentGrade(result);
+    setFinalCurrent(result.toFixed(1));
+  };
+
+  const calculateFinal = () => {
+    const cur = parseFloat(finalCurrent);
+    const goal = parseFloat(goalGrade);
+    const w = parseFloat(finalWeight);
+    if (isNaN(cur) || isNaN(goal) || isNaN(w) || w <= 0 || w > 100) {
+      setFinalResult('invalid');
+      return;
+    }
+    const needed = (goal - cur * (1 - w / 100)) / (w / 100);
+    setFinalResult(needed);
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div className="card">
+        <h2 style={{ fontSize: 17, fontWeight: 700, marginBottom: 4 }}>Grade calculator</h2>
+        <p style={{ color: 'var(--gray-500)', fontSize: 13, marginBottom: 18 }}>
+          Enter each assignment's grade and weight to find your current overall grade.
+        </p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'flex', gap: 10, fontSize: 12, fontWeight: 600, color: 'var(--gray-500)', padding: '0 2px' }}>
+            <span style={{ flex: 3 }}>Assignment (optional)</span>
+            <span style={{ flex: 1 }}>Grade</span>
+            <span style={{ flex: 1 }}>Weight %</span>
+          </div>
+          {rows.map((r, i) => (
+            <div key={i} style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <input className="input" style={{ flex: 3, minWidth: 140 }} placeholder="e.g. Homework 1" value={r.name} onChange={e => updateRow(i, 'name', e.target.value)} />
+              <input className="input" style={{ flex: 1, minWidth: 70 }} type="number" placeholder="91" value={r.grade} onChange={e => updateRow(i, 'grade', e.target.value)} />
+              <input className="input" style={{ flex: 1, minWidth: 70 }} type="number" placeholder="10" value={r.weight} onChange={e => updateRow(i, 'weight', e.target.value)} />
+            </div>
+          ))}
+        </div>
+
+        <button className="btn btn-ghost btn-sm" style={{ marginTop: 14 }} onClick={addRow}>+ Add row</button>
+
+        <button className="btn btn-primary" style={{ marginTop: 18, width: '100%' }} onClick={calculateGrade}>
+          Calculate current grade
+        </button>
+
+        {currentGrade === 'no-data' && (
+          <div className="alert alert-error" style={{ marginTop: 16 }}>Enter at least one grade and weight.</div>
+        )}
+        {typeof currentGrade === 'number' && (
+          <div className="alert alert-success" style={{ marginTop: 16 }}>
+            Your current grade is <strong>{currentGrade.toFixed(1)}%</strong>
+          </div>
+        )}
+      </div>
+
+      <div className="card">
+        <h2 style={{ fontSize: 17, fontWeight: 700, marginBottom: 4 }}>What do I need on the final?</h2>
+        <p style={{ color: 'var(--gray-500)', fontSize: 13, marginBottom: 18 }}>
+          Figure out the score you need on a final exam or remaining work to hit your goal.
+        </p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div className="form-group">
+            <label className="label">Your current grade (%)</label>
+            <input className="input" type="number" value={finalCurrent} onChange={e => setFinalCurrent(e.target.value)} placeholder="e.g. 88" />
+          </div>
+          <div className="form-group">
+            <label className="label">The grade you want (%)</label>
+            <input className="input" type="number" value={goalGrade} onChange={e => setGoalGrade(e.target.value)} placeholder="e.g. 90" />
+          </div>
+          <div className="form-group">
+            <label className="label">The final is worth (%)</label>
+            <input className="input" type="number" value={finalWeight} onChange={e => setFinalWeight(e.target.value)} placeholder="e.g. 20" />
+          </div>
+        </div>
+
+        <button className="btn btn-primary" style={{ marginTop: 18, width: '100%' }} onClick={calculateFinal}>
+          Calculate
+        </button>
+
+        {finalResult === 'invalid' && (
+          <div className="alert alert-error" style={{ marginTop: 16 }}>Please fill in all three fields with valid numbers (weight between 1 and 100).</div>
+        )}
+        {typeof finalResult === 'number' && finalResult > 100 && (
+          <div className="alert alert-error" style={{ marginTop: 16 }}>
+            Even a perfect 100% on the final won't be enough to reach that goal.
+          </div>
+        )}
+        {typeof finalResult === 'number' && finalResult <= 0 && (
+          <div className="alert alert-success" style={{ marginTop: 16 }}>
+            You've already secured that grade — any score on the final works!
+          </div>
+        )}
+        {typeof finalResult === 'number' && finalResult > 0 && finalResult <= 100 && (
+          <div className="alert alert-success" style={{ marginTop: 16 }}>
+            You need a <strong>{finalResult.toFixed(1)}%</strong> or higher on the final.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function GpaCalculator() {
+  const [rows, setRows] = useState([
+    { name: '', letter: '', credits: '' },
+    { name: '', letter: '', credits: '' },
+    { name: '', letter: '', credits: '' }
+  ]);
+  const [gpa, setGpa] = useState(null);
+
+  const updateRow = (i, field, value) => {
+    setRows(rs => rs.map((r, idx) => idx === i ? { ...r, [field]: value } : r));
+  };
+
+  const addRow = () => setRows(rs => [...rs, { name: '', letter: '', credits: '' }]);
+
+  const calculate = () => {
+    let points = 0, credits = 0;
+    rows.forEach(r => {
+      const c = parseFloat(r.credits);
+      if (r.letter && GRADE_POINTS[r.letter] !== undefined && !isNaN(c) && c > 0) {
+        points += GRADE_POINTS[r.letter] * c;
+        credits += c;
+      }
+    });
+    if (credits === 0) { setGpa('no-data'); return; }
+    setGpa(points / credits);
+  };
+
+  return (
+    <div className="card">
+      <h2 style={{ fontSize: 17, fontWeight: 700, marginBottom: 4 }}>GPA calculator</h2>
+      <p style={{ color: 'var(--gray-500)', fontSize: 13, marginBottom: 18 }}>
+        Enter each course's letter grade and credit hours to calculate your GPA (4.0 scale).
+      </p>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ display: 'flex', gap: 10, fontSize: 12, fontWeight: 600, color: 'var(--gray-500)', padding: '0 2px' }}>
+          <span style={{ flex: 3 }}>Course (optional)</span>
+          <span style={{ flex: 1 }}>Grade</span>
+          <span style={{ flex: 1 }}>Credits</span>
+        </div>
+        {rows.map((r, i) => (
+          <div key={i} style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <input className="input" style={{ flex: 3, minWidth: 140 }} placeholder="e.g. Algebra II" value={r.name} onChange={e => updateRow(i, 'name', e.target.value)} />
+            <select className="input" style={{ flex: 1, minWidth: 70 }} value={r.letter} onChange={e => updateRow(i, 'letter', e.target.value)}>
+              <option value="">—</option>
+              {Object.keys(GRADE_POINTS).map(g => <option key={g} value={g}>{g}</option>)}
+            </select>
+            <input className="input" style={{ flex: 1, minWidth: 70 }} type="number" placeholder="3" value={r.credits} onChange={e => updateRow(i, 'credits', e.target.value)} />
+          </div>
+        ))}
+      </div>
+
+      <button className="btn btn-ghost btn-sm" style={{ marginTop: 14 }} onClick={addRow}>+ Add row</button>
+
+      <button className="btn btn-primary" style={{ marginTop: 18, width: '100%' }} onClick={calculate}>
+        Calculate GPA
+      </button>
+
+      {gpa === 'no-data' && (
+        <div className="alert alert-error" style={{ marginTop: 16 }}>Enter at least one grade and credit value.</div>
+      )}
+      {typeof gpa === 'number' && (
+        <div className="alert alert-success" style={{ marginTop: 16 }}>
+          Your GPA is <strong>{gpa.toFixed(2)}</strong>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function Tools() {
+  const [activeTab, setActiveTab] = useState('grade');
+
+  return (
+    <div className="page">
+      <div className="container" style={{ maxWidth: 700 }}>
+        <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 20 }}>Tools</h1>
+
+        <div className="tabs" style={{ marginBottom: 20 }}>
+          <button className={`tab ${activeTab === 'grade' ? 'active' : ''}`} onClick={() => setActiveTab('grade')}>Grade calculator</button>
+          <button className={`tab ${activeTab === 'gpa' ? 'active' : ''}`} onClick={() => setActiveTab('gpa')}>GPA calculator</button>
+        </div>
+
+        {activeTab === 'grade' ? <GradeCalculator /> : <GpaCalculator />}
+      </div>
+    </div>
+  );
+}
+ENDOFFILE
+
+import { useState } from 'react';
+
+const GRADE_POINTS = {
+  'A+': 4.0, 'A': 4.0, 'A-': 3.7,
+  'B+': 3.3, 'B': 3.0, 'B-': 2.7,
+  'C+': 2.3, 'C': 2.0, 'C-': 1.7,
+  'D+': 1.3, 'D': 1.0, 'D-': 0.7,
+  'F': 0.0
+};
+
+function GradeCalculator() {
+  const [rows, setRows] = useState([
+    { name: '', grade: '', weight: '' },
+    { name: '', grade: '', weight: '' },
+    { name: '', grade: '', weight: '' }
+  ]);
+  const [currentGrade, setCurrentGrade] = useState(null);
+
+  const [goalGrade, setGoalGrade] = useState('');
+  const [finalCurrent, setFinalCurrent] = useState('');
+  const [finalWeight, setFinalWeight] = useState('');
+  const [finalResult, setFinalResult] = useState(null);
+
+  const updateRow = (i, field, value) => {
+    setRows(rs => rs.map((r, idx) => idx === i ? { ...r, [field]: value } : r));
+  };
+
+  const addRow = () => setRows(rs => [...rs, { name: '', grade: '', weight: '' }]);
+
+  const calculateGrade = () => {
+    let weightedSum = 0, weightTotal = 0;
+    rows.forEach(r => {
+      const g = parseFloat(r.grade), w = parseFloat(r.weight);
+      if (!isNaN(g) && !isNaN(w) && w > 0) {
+        weightedSum += g * w;
+        weightTotal += w;
+      }
+    });
+    if (weightTotal === 0) { setCurrentGrade('no-data'); return; }
+    const result = weightedSum / weightTotal;
+    setCurrentGrade(result);
+    setFinalCurrent(result.toFixed(1));
+  };
+
+  const calculateFinal = () => {
+    const cur = parseFloat(finalCurrent);
+    const goal = parseFloat(goalGrade);
+    const w = parseFloat(finalWeight);
+    if (isNaN(cur) || isNaN(goal) || isNaN(w) || w <= 0 || w > 100) {
+      setFinalResult('invalid');
+      return;
+    }
+    const needed = (goal - cur * (1 - w / 100)) / (w / 100);
+    setFinalResult(needed);
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div className="card">
+        <h2 style={{ fontSize: 17, fontWeight: 700, marginBottom: 4 }}>Grade calculator</h2>
+        <p style={{ color: 'var(--gray-500)', fontSize: 13, marginBottom: 18 }}>
+          Enter each assignment's grade and weight to find your current overall grade.
+        </p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'flex', gap: 10, fontSize: 12, fontWeight: 600, color: 'var(--gray-500)', padding: '0 2px' }}>
+            <span style={{ flex: 3 }}>Assignment (optional)</span>
+            <span style={{ flex: 1 }}>Grade</span>
+            <span style={{ flex: 1 }}>Weight %</span>
+          </div>
+          {rows.map((r, i) => (
+            <div key={i} style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <input className="input" style={{ flex: 3, minWidth: 140 }} placeholder="e.g. Homework 1" value={r.name} onChange={e => updateRow(i, 'name', e.target.value)} />
+              <input className="input" style={{ flex: 1, minWidth: 70 }} type="number" placeholder="91" value={r.grade} onChange={e => updateRow(i, 'grade', e.target.value)} />
+              <input className="input" style={{ flex: 1, minWidth: 70 }} type="number" placeholder="10" value={r.weight} onChange={e => updateRow(i, 'weight', e.target.value)} />
+            </div>
+          ))}
+        </div>
+
+        <button className="btn btn-ghost btn-sm" style={{ marginTop: 14 }} onClick={addRow}>+ Add row</button>
+
+        <button className="btn btn-primary" style={{ marginTop: 18, width: '100%' }} onClick={calculateGrade}>
+          Calculate current grade
+        </button>
+
+        {currentGrade === 'no-data' && (
+          <div className="alert alert-error" style={{ marginTop: 16 }}>Enter at least one grade and weight.</div>
+        )}
+        {typeof currentGrade === 'number' && (
+          <div className="alert alert-success" style={{ marginTop: 16 }}>
+            Your current grade is <strong>{currentGrade.toFixed(1)}%</strong>
+          </div>
+        )}
+      </div>
+
+      <div className="card">
+        <h2 style={{ fontSize: 17, fontWeight: 700, marginBottom: 4 }}>What do I need on the final?</h2>
+        <p style={{ color: 'var(--gray-500)', fontSize: 13, marginBottom: 18 }}>
+          Figure out the score you need on a final exam or remaining work to hit your goal.
+        </p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div className="form-group">
+            <label className="label">Your current grade (%)</label>
+            <input className="input" type="number" value={finalCurrent} onChange={e => setFinalCurrent(e.target.value)} placeholder="e.g. 88" />
+          </div>
+          <div className="form-group">
+            <label className="label">The grade you want (%)</label>
+            <input className="input" type="number" value={goalGrade} onChange={e => setGoalGrade(e.target.value)} placeholder="e.g. 90" />
+          </div>
+          <div className="form-group">
+            <label className="label">The final is worth (%)</label>
+            <input className="input" type="number" value={finalWeight} onChange={e => setFinalWeight(e.target.value)} placeholder="e.g. 20" />
+          </div>
+        </div>
+
+        <button className="btn btn-primary" style={{ marginTop: 18, width: '100%' }} onClick={calculateFinal}>
+          Calculate
+        </button>
+
+        {finalResult === 'invalid' && (
+          <div className="alert alert-error" style={{ marginTop: 16 }}>Please fill in all three fields with valid numbers (weight between 1 and 100).</div>
+        )}
+        {typeof finalResult === 'number' && finalResult > 100 && (
+          <div className="alert alert-error" style={{ marginTop: 16 }}>
+            Even a perfect 100% on the final won't be enough to reach that goal.
+          </div>
+        )}
+        {typeof finalResult === 'number' && finalResult <= 0 && (
+          <div className="alert alert-success" style={{ marginTop: 16 }}>
+            You've already secured that grade — any score on the final works!
+          </div>
+        )}
+        {typeof finalResult === 'number' && finalResult > 0 && finalResult <= 100 && (
+          <div className="alert alert-success" style={{ marginTop: 16 }}>
+            You need a <strong>{finalResult.toFixed(1)}%</strong> or higher on the final.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function GpaCalculator() {
+  const [rows, setRows] = useState([
+    { name: '', letter: '', credits: '' },
+    { name: '', letter: '', credits: '' },
+    { name: '', letter: '', credits: '' }
+  ]);
+  const [gpa, setGpa] = useState(null);
+
+  const updateRow = (i, field, value) => {
+    setRows(rs => rs.map((r, idx) => idx === i ? { ...r, [field]: value } : r));
+  };
+
+  const addRow = () => setRows(rs => [...rs, { name: '', letter: '', credits: '' }]);
+
+  const calculate = () => {
+    let points = 0, credits = 0;
+    rows.forEach(r => {
+      const c = parseFloat(r.credits);
+      if (r.letter && GRADE_POINTS[r.letter] !== undefined && !isNaN(c) && c > 0) {
+        points += GRADE_POINTS[r.letter] * c;
+        credits += c;
+      }
+    });
+    if (credits === 0) { setGpa('no-data'); return; }
+    setGpa(points / credits);
+  };
+
+  return (
+    <div className="card">
+      <h2 style={{ fontSize: 17, fontWeight: 700, marginBottom: 4 }}>GPA calculator</h2>
+      <p style={{ color: 'var(--gray-500)', fontSize: 13, marginBottom: 18 }}>
+        Enter each course's letter grade and credit hours to calculate your GPA (4.0 scale).
+      </p>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ display: 'flex', gap: 10, fontSize: 12, fontWeight: 600, color: 'var(--gray-500)', padding: '0 2px' }}>
+          <span style={{ flex: 3 }}>Course (optional)</span>
+          <span style={{ flex: 1 }}>Grade</span>
+          <span style={{ flex: 1 }}>Credits</span>
+        </div>
+        {rows.map((r, i) => (
+          <div key={i} style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <input className="input" style={{ flex: 3, minWidth: 140 }} placeholder="e.g. Algebra II" value={r.name} onChange={e => updateRow(i, 'name', e.target.value)} />
+            <select className="input" style={{ flex: 1, minWidth: 70 }} value={r.letter} onChange={e => updateRow(i, 'letter', e.target.value)}>
+              <option value="">—</option>
+              {Object.keys(GRADE_POINTS).map(g => <option key={g} value={g}>{g}</option>)}
+            </select>
+            <input className="input" style={{ flex: 1, minWidth: 70 }} type="number" placeholder="3" value={r.credits} onChange={e => updateRow(i, 'credits', e.target.value)} />
+          </div>
+        ))}
+      </div>
+
+      <button className="btn btn-ghost btn-sm" style={{ marginTop: 14 }} onClick={addRow}>+ Add row</button>
+
+      <button className="btn btn-primary" style={{ marginTop: 18, width: '100%' }} onClick={calculate}>
+        Calculate GPA
+      </button>
+
+      {gpa === 'no-data' && (
+        <div className="alert alert-error" style={{ marginTop: 16 }}>Enter at least one grade and credit value.</div>
+      )}
+      {typeof gpa === 'number' && (
+        <div className="alert alert-success" style={{ marginTop: 16 }}>
+          Your GPA is <strong>{gpa.toFixed(2)}</strong>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function Tools() {
+  const [activeTab, setActiveTab] = useState('grade');
+
+  return (
+    <div className="page">
+      <div className="container" style={{ maxWidth: 700 }}>
+        <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 20 }}>Tools</h1>
+
+        <div className="tabs" style={{ marginBottom: 20 }}>
+          <button className={`tab ${activeTab === 'grade' ? 'active' : ''}`} onClick={() => setActiveTab('grade')}>Grade calculator</button>
+          <button className={`tab ${activeTab === 'gpa' ? 'active' : ''}`} onClick={() => setActiveTab('gpa')}>GPA calculator</button>
+        </div>
+
+        {activeTab === 'grade' ? <GradeCalculator /> : <GpaCalculator />}
+      </div>
+    </div>
+  );
+}
