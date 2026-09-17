@@ -1,4 +1,4 @@
-# 📚 AI Study Helper — Complete Setup & Deployment Guide
+# 📚 TutorPulseAI — Complete Setup & Deployment Guide
 
 Turn any homework file into AI-generated summaries, key points, flashcards, and quizzes.  
 **Stack:** React · Node/Express · MongoDB Atlas · Stripe · Anthropic Claude · Nodemailer
