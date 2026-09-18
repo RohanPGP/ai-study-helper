@@ -62,6 +62,7 @@ app.use('/upload', uploadRoutes);
 app.use('/process', processRoutes);
 app.use('/email', emailRoutes);
 app.use('/history', historyRoutes);
+app.use('/share', shareRoutes);
 
 // ── Global error handler ───────────────────────────────────────────────────────
 app.use((err, req, res, next) => {
