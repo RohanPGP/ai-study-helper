@@ -12,6 +12,8 @@ import StudyPackView from './pages/StudyPackView';
 import About from './pages/About';
 import Tools from './pages/Tools';
 import SharedStudyPack from './pages/SharedStudyPack';
+import Settings from './pages/Settings';
+import Guide from './pages/Guide';
 import './styles/global.css';
 
 function AppRoutes() {
@@ -39,6 +41,12 @@ function AppRoutes() {
         } />
         <Route path="/study-pack/:id" element={
           <ProtectedRoute><StudyPackView /></ProtectedRoute>
+        } />
+        <Route path="/settings" element={
+          <ProtectedRoute><Settings /></ProtectedRoute>
+        } />
+        <Route path="/guide" element={
+          <ProtectedRoute><Guide /></ProtectedRoute>
         } />
 
         <Route path="*" element={<Navigate to="/" replace />} />
