@@ -37,14 +37,20 @@ router.post('/', protect, requireSubscription, upload.single('file'), async (req
   const subject = req.body.subject?.trim() || '';
   const difficulty = ['easy', 'medium', 'hard'].includes(req.body.difficulty) ? req.body.difficulty : 'medium';
 
-  const pack = await StudyPack.create({
-    userId: req.user._id,
-    title,
-    subject,
-    difficulty,
-    originalFilename: req.file.originalname,
-    status: 'processing'
-  });
+    let pack;
+  try {
+    pack = await StudyPack.create({
+      userId: req.user._id,
+      title,
+      subject,
+      difficulty,
+      originalFilename: req.file.originalname,
+      status: 'processing'
+    });
+  } catch (err) {
+    console.error('Failed to create study pack:', err.message);
+    return res.status(500).json({ error: 'Failed to start upload. Please try again.' });
+  }
 
   res.status(202).json({
     message: 'File uploaded. Processing has started.',
