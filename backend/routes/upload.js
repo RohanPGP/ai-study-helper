@@ -23,41 +23,41 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
+  limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (_, file, cb) => {
     if (ALLOWED_MIME_TYPES.includes(file.mimetype)) return cb(null, true);
     cb(new Error('Only PDF, DOCX, and TXT files are allowed'));
   }
 });
 
-// POST /upload  — upload + kick off AI processing
 router.post('/', protect, requireSubscription, upload.single('file'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
   const title = req.body.title?.trim() || req.file.originalname.replace(/\.[^/.]+$/, '');
+  const subject = req.body.subject?.trim() || '';
+  const difficulty = ['easy', 'medium', 'hard'].includes(req.body.difficulty) ? req.body.difficulty : 'medium';
 
-  // Create a pending study pack immediately
   const pack = await StudyPack.create({
     userId: req.user._id,
     title,
+    subject,
+    difficulty,
     originalFilename: req.file.originalname,
     status: 'processing'
   });
 
-  // Return the pack ID right away — processing happens async
   res.status(202).json({
     message: 'File uploaded. Processing has started.',
     studyPackId: pack._id
   });
 
-  // Async processing (fire and forget — client polls /history/:id)
   setImmediate(async () => {
     try {
       const { text, fileType } = await extractText(req.file.path, req.file.mimetype);
 
       if (!text || text.trim().length < 50) throw new Error('Not enough text content to process');
 
-      const aiResult = await generateStudyPack(text, title);
+      const aiResult = await generateStudyPack(text, title, difficulty);
 
       await StudyPack.findByIdAndUpdate(pack._id, {
         fileType,
