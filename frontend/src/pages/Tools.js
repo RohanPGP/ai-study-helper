@@ -228,6 +228,140 @@ function GpaCalculator() {
   );
 }
 
+const MLA_MONTHS = ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.'];
+const APA_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+function formatMLADate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr + 'T00:00:00');
+  if (isNaN(d)) return '';
+  return `${d.getDate()} ${MLA_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function formatAPADate(dateStr) {
+  if (!dateStr) return 'n.d.';
+  const d = new Date(dateStr + 'T00:00:00');
+  if (isNaN(d)) return 'n.d.';
+  return `${d.getFullYear()}, ${APA_MONTHS[d.getMonth()]} ${d.getDate()}`;
+}
+
+function formatMLA({ authorLast, authorFirst, pageTitle, siteName, url, pubDate }) {
+  const authorPart = authorLast ? `${authorLast}${authorFirst ? ', ' + authorFirst : ''}. ` : '';
+  const dateStr = formatMLADate(pubDate);
+  const datePart = dateStr ? `${dateStr}, ` : '';
+  return `${authorPart}"${pageTitle}." ${siteName}, ${datePart}${url}.`;
+}
+
+function formatAPA({ authorLast, authorFirst, pageTitle, siteName, url, pubDate }) {
+  const authorPart = authorLast ? `${authorLast}, ${authorFirst ? authorFirst.charAt(0) + '.' : ''} ` : '';
+  const dateStr = formatAPADate(pubDate);
+  if (authorLast) {
+    return `${authorPart}(${dateStr}). ${pageTitle}. ${siteName}. ${url}`;
+  }
+  return `${pageTitle}. (${dateStr}). ${siteName}. ${url}`;
+}
+
+function CitationGenerator() {
+  const [style, setStyle] = useState('MLA');
+  const [authorLast, setAuthorLast] = useState('');
+  const [authorFirst, setAuthorFirst] = useState('');
+  const [pageTitle, setPageTitle] = useState('');
+  const [siteName, setSiteName] = useState('');
+  const [url, setUrl] = useState('');
+  const [pubDate, setPubDate] = useState('');
+  const [citation, setCitation] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  const generate = () => {
+    if (!pageTitle || !siteName || !url) {
+      setCitation('Please fill in at least the page title, site name, and URL.');
+      return;
+    }
+    const result = style === 'MLA'
+      ? formatMLA({ authorLast, authorFirst, pageTitle, siteName, url, pubDate })
+      : formatAPA({ authorLast, authorFirst, pageTitle, siteName, url, pubDate });
+    setCitation(result);
+    setCopied(false);
+  };
+
+  const copy = () => {
+    navigator.clipboard.writeText(citation);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const toggleBtn = (active) => ({
+    padding: '8px 16px', borderRadius: 'var(--radius)', fontSize: 13, fontWeight: 600,
+    border: active ? 'none' : '1.5px solid var(--gray-200)',
+    background: active ? 'var(--indigo-600)' : 'transparent',
+    color: active ? '#fff' : 'var(--gray-500)',
+    cursor: 'pointer'
+  });
+
+  return (
+    <div className="card">
+      <h2 style={{ fontSize: 17, fontWeight: 700, marginBottom: 4 }}>Citation generator</h2>
+      <p style={{ color: 'var(--gray-500)', fontSize: 13, marginBottom: 18 }}>
+        Generate a website citation in MLA or APA format.
+      </p>
+
+      <div style={{ marginBottom: 18 }}>
+        <label className="label">Style</label>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button style={toggleBtn(style === 'MLA')} onClick={() => setStyle('MLA')}>MLA</button>
+          <button style={toggleBtn(style === 'APA')} onClick={() => setStyle('APA')}>APA</button>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <div className="form-group" style={{ flex: 1, minWidth: 140 }}>
+            <label className="label">Author last name (optional)</label>
+            <input className="input" value={authorLast} onChange={e => setAuthorLast(e.target.value)} placeholder="Smith" />
+          </div>
+          <div className="form-group" style={{ flex: 1, minWidth: 140 }}>
+            <label className="label">Author first name (optional)</label>
+            <input className="input" value={authorFirst} onChange={e => setAuthorFirst(e.target.value)} placeholder="Jane" />
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label className="label">Page title</label>
+          <input className="input" value={pageTitle} onChange={e => setPageTitle(e.target.value)} placeholder="e.g. Photosynthesis Explained" />
+        </div>
+
+        <div className="form-group">
+          <label className="label">Website / publisher name</label>
+          <input className="input" value={siteName} onChange={e => setSiteName(e.target.value)} placeholder="e.g. Khan Academy" />
+        </div>
+
+        <div className="form-group">
+          <label className="label">URL</label>
+          <input className="input" value={url} onChange={e => setUrl(e.target.value)} placeholder="https://..." />
+        </div>
+
+        <div className="form-group">
+          <label className="label">Publish date (optional)</label>
+          <input className="input" type="date" value={pubDate} onChange={e => setPubDate(e.target.value)} />
+        </div>
+      </div>
+
+      <button className="btn btn-primary" style={{ marginTop: 18, width: '100%' }} onClick={generate}>
+        Generate citation
+      </button>
+
+      {citation && (
+        <div className="card" style={{ marginTop: 16, background: 'var(--gray-50)' }}>
+          <p style={{ fontSize: 14, color: 'var(--gray-900)', lineHeight: 1.6 }}>{citation}</p>
+          <button className="btn btn-ghost btn-sm" style={{ marginTop: 10 }} onClick={copy}>
+            {copied ? '✓ Copied' : 'Copy'}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Tools() {
   const [activeTab, setActiveTab] = useState('grade');
 
@@ -239,9 +373,12 @@ export default function Tools() {
         <div className="tabs" style={{ marginBottom: 20 }}>
           <button className={`tab ${activeTab === 'grade' ? 'active' : ''}`} onClick={() => setActiveTab('grade')}>Grade calculator</button>
           <button className={`tab ${activeTab === 'gpa' ? 'active' : ''}`} onClick={() => setActiveTab('gpa')}>GPA calculator</button>
+          <button className={`tab ${activeTab === 'citation' ? 'active' : ''}`} onClick={() => setActiveTab('citation')}>Citations</button>
         </div>
 
-        {activeTab === 'grade' ? <GradeCalculator /> : <GpaCalculator />}
+        {activeTab === 'grade' && <GradeCalculator />}
+        {activeTab === 'gpa' && <GpaCalculator />}
+        {activeTab === 'citation' && <CitationGenerator />}
       </div>
     </div>
   );
