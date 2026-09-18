@@ -1,11 +1,13 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { api } from '../utils/api';
 
 const DIFFICULTIES = ['easy', 'medium', 'hard'];
 
 export default function Settings() {
-  const { user, refreshUser } = useAuth();
+  const { user, refreshUser, logout } = useAuth();
+  const navigate = useNavigate();
 
   const [theme, setThemeState] = useState(() => localStorage.getItem('theme') || 'dark');
   const setTheme = (t) => {
@@ -61,6 +63,11 @@ export default function Settings() {
     } finally {
       setPwSaving(false);
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
   const toggleBtn = (active) => ({
@@ -135,6 +142,14 @@ export default function Settings() {
             <button className="btn btn-primary btn-sm" style={{ marginTop: 12 }} onClick={savePassword} disabled={pwSaving}>
               {pwSaving ? 'Saving…' : 'Change password'}
             </button>
+          </div>
+
+          <div className="card">
+            <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 14 }}>Session</h2>
+            <p style={{ fontSize: 13, color: 'var(--gray-500)', marginBottom: 14 }}>
+              Signed in as {user?.email}
+            </p>
+            <button className="btn btn-danger btn-sm" onClick={handleLogout}>Logout</button>
           </div>
         </div>
       </div>
