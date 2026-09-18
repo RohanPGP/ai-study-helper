@@ -41,7 +41,7 @@ export default function Home() {
           <div style={{ display: 'flex', gap: 40, flexWrap: 'wrap', justifyContent: 'center' }}>
             <Step n={1} icon="📤" title="Upload your file" desc="PDF, Word doc, or plain text — we handle all formats up to 10 MB." />
             <Step n={2} icon="🤖" title="AI does the work" desc="AI reads and understands your material, then creates a complete study pack." />
-            <Step n={3} icon="🎓" title="Study smarter" desc="Flip flashcards, take the quiz, review key points, and email yourself the pack." />
+            <Step n={3} icon="🎓" title="Study smarter" desc="Flip flashcards, take the quiz, review key points, and track your progress." />
           </div>
         </div>
       </section>
@@ -53,11 +53,13 @@ export default function Home() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20 }}>
             {[
               { icon: '📝', title: 'Smart Summary', desc: 'Multi-paragraph summaries covering all major topics from your material.' },
-              { icon: '🔑', title: 'Key Points', desc: '8 essential takeaways extracted and prioritized for quick review.' },
-              { icon: '🃏', title: 'Flashcards', desc: '10 interactive flip cards covering vocabulary and concepts — click to reveal.' },
-              { icon: '📋', title: 'Auto Quiz', desc: '8 multiple-choice questions with explanations and instant scoring.' },
-              { icon: '📧', title: 'Email Delivery', desc: 'Send the full study pack to any email for offline study.' },
-              { icon: '📚', title: 'Study History', desc: 'All your packs saved and organized. Reprocess anytime.' },
+              { icon: '🔑', title: 'Key Points', desc: 'The most important takeaways extracted and prioritized for quick review.' },
+              { icon: '🃏', title: 'Flashcards', desc: 'Interactive flip cards covering vocabulary and concepts — click to reveal.' },
+              { icon: '📋', title: 'Adaptive Quiz', desc: 'Choose Easy, Medium, or Hard, then retake just the questions you missed.' },
+              { icon: '🔗', title: 'Shareable Links', desc: 'Generate a public read-only link so classmates can view a study pack — no account needed.' },
+              { icon: '⬇', title: 'PDF Export', desc: 'Download any study pack as a printable PDF, all sections included.' },
+              { icon: '📚', title: 'Subjects & History', desc: 'Organize uploads by subject and filter your full study history anytime.' },
+              { icon: '🧮', title: 'Study Tools', desc: 'Built-in grade calculator, GPA calculator, and MLA/APA citation generator.' },
             ].map(f => (
               <div key={f.title} className="card" style={{ padding: 24 }}>
                 <div style={{ fontSize: 28, marginBottom: 10 }}>{f.icon}</div>
