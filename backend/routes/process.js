@@ -21,7 +21,7 @@ router.post('/:id', protect, requireSubscription, async (req, res) => {
 
     setImmediate(async () => {
       try {
-        const aiResult = await generateStudyPack(pack.extractedText, pack.title);
+        const aiResult = await generateStudyPack(pack.extractedText, pack.title, pack.difficulty);
         await StudyPack.findByIdAndUpdate(pack._id, {
           summary: aiResult.summary,
           keyPoints: aiResult.keyPoints || [],
