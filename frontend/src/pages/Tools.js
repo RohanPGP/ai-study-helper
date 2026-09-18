@@ -327,7 +327,8 @@ function CitationGenerator() {
         </div>
       </div>
 
-              <div className="calc-row-rest">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div className="calc-row-rest">
           <div className="form-group">
             <label className="label">Author last name (optional)</label>
             <input className="input" value={authorLast} onChange={e => setAuthorLast(e.target.value)} placeholder="Smith" />
