@@ -1,8 +1,8 @@
 const router = require('express').Router();
+const crypto = require('crypto');
 const StudyPack = require('../models/StudyPack');
 const { protect } = require('../middleware/auth');
 
-// GET /history — all study packs for user
 router.get('/', protect, async (req, res) => {
   try {
     const page = Math.max(1, parseInt(req.query.page) || 1);
@@ -35,7 +35,6 @@ router.get('/', protect, async (req, res) => {
   }
 });
 
-// GET /history/:id — single study pack (full detail)
 router.get('/:id', protect, async (req, res) => {
   try {
     const pack = await StudyPack.findOne({ _id: req.params.id, userId: req.user._id });
@@ -46,7 +45,6 @@ router.get('/:id', protect, async (req, res) => {
   }
 });
 
-// DELETE /history/:id
 router.delete('/:id', protect, async (req, res) => {
   try {
     const result = await StudyPack.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
@@ -54,6 +52,35 @@ router.delete('/:id', protect, async (req, res) => {
     res.json({ message: 'Study pack deleted' });
   } catch (err) {
     res.status(500).json({ error: 'Failed to delete study pack' });
+  }
+});
+
+// POST /history/:id/share — enable a public read-only link
+router.post('/:id/share', protect, async (req, res) => {
+  try {
+    const pack = await StudyPack.findOne({ _id: req.params.id, userId: req.user._id });
+    if (!pack) return res.status(404).json({ error: 'Study pack not found' });
+    if (!pack.shareToken) {
+      pack.shareToken = crypto.randomBytes(12).toString('hex');
+      await pack.save();
+    }
+    res.json({ shareToken: pack.shareToken });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to create share link' });
+  }
+});
+
+// DELETE /history/:id/share — revoke the public link
+router.delete('/:id/share', protect, async (req, res) => {
+  try {
+    const pack = await StudyPack.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user._id },
+      { shareToken: null }
+    );
+    if (!pack) return res.status(404).json({ error: 'Study pack not found' });
+    res.json({ message: 'Sharing disabled' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to revoke share link' });
   }
 });
 
