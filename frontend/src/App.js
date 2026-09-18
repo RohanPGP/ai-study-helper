@@ -11,6 +11,7 @@ import Upload from './pages/Upload';
 import StudyPackView from './pages/StudyPackView';
 import About from './pages/About';
 import Tools from './pages/Tools';
+import SharedStudyPack from './pages/SharedStudyPack';
 import './styles/global.css';
 
 function AppRoutes() {
@@ -27,6 +28,7 @@ function AppRoutes() {
         <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <Signup />} />
         <Route path="/about" element={<About />} />
         <Route path="/tools" element={<Tools />} />
+        <Route path="/share/:token" element={<SharedStudyPack />} />
 
         <Route path="/payment" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={
