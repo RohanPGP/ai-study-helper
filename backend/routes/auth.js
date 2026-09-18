@@ -6,7 +6,6 @@ const { protect } = require('../middleware/auth');
 const signToken = (id, expiresIn) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: expiresIn || process.env.JWT_EXPIRES_IN || '7d' });
 
-// POST /auth/signup
 router.post('/signup', async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -34,7 +33,6 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-// POST /auth/login
 router.post('/login', async (req, res) => {
   try {
     const { email, password, rememberMe } = req.body;
@@ -63,7 +61,6 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// GET /auth/me
 router.get('/me', protect, async (req, res) => {
   res.json({
     user: {
@@ -76,6 +73,53 @@ router.get('/me', protect, async (req, res) => {
       hasActiveSubscription: req.user.hasActiveSubscription()
     }
   });
+});
+
+// PUT /auth/me — update display name
+router.put('/me', protect, async (req, res) => {
+  try {
+    const { name } = req.body;
+    if (!name || !name.trim()) return res.status(400).json({ error: 'Name is required' });
+
+    req.user.name = name.trim();
+    await req.user.save();
+
+    res.json({
+      user: {
+        id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        subscriptionStatus: req.user.subscriptionStatus,
+        subscriptionCurrentPeriodEnd: req.user.subscriptionCurrentPeriodEnd,
+        uploadsThisMonth: req.user.uploadsThisMonth,
+        hasActiveSubscription: req.user.hasActiveSubscription()
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update profile' });
+  }
+});
+
+// PUT /auth/password — change password
+router.put('/password', protect, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword)
+      return res.status(400).json({ error: 'Current and new password are required' });
+    if (newPassword.length < 8)
+      return res.status(400).json({ error: 'New password must be at least 8 characters' });
+
+    const user = await User.findById(req.user._id).select('+password');
+    if (!(await user.comparePassword(currentPassword)))
+      return res.status(401).json({ error: 'Current password is incorrect' });
+
+    user.password = newPassword;
+    await user.save();
+
+    res.json({ message: 'Password updated successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update password' });
+  }
 });
 
 module.exports = router;
