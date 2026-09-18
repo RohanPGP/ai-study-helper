@@ -5,6 +5,8 @@ import { api } from '../utils/api';
 export default function Upload() {
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState('');
+  const [subject, setSubject] = useState('');
+  const [difficulty, setDifficulty] = useState('medium');
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
@@ -53,6 +55,8 @@ export default function Upload() {
     const fd = new FormData();
     fd.append('file', file);
     fd.append('title', title || file.name.replace(/\.[^/.]+$/, ''));
+    fd.append('subject', subject.trim());
+    fd.append('difficulty', difficulty);
 
     try {
       await api.upload(fd);
@@ -75,7 +79,6 @@ export default function Upload() {
         </div>
 
         <form onSubmit={handleSubmit}>
-          {/* Drop zone */}
           <div
             className="card"
             onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
@@ -128,6 +131,27 @@ export default function Upload() {
               onChange={e => setTitle(e.target.value)}
               maxLength={200}
             />
+          </div>
+
+          <div className="form-group" style={{ marginBottom: 24 }}>
+            <label className="label">Subject (optional)</label>
+            <input
+              className="input"
+              type="text"
+              placeholder="e.g. Biology"
+              value={subject}
+              onChange={e => setSubject(e.target.value)}
+              maxLength={100}
+            />
+          </div>
+
+          <div className="form-group" style={{ marginBottom: 24 }}>
+            <label className="label">Quiz difficulty</label>
+            <select className="input" value={difficulty} onChange={e => setDifficulty(e.target.value)}>
+              <option value="easy">Easy</option>
+              <option value="medium">Medium</option>
+              <option value="hard">Hard</option>
+            </select>
           </div>
 
           {error && <div className="alert alert-error" style={{ marginBottom: 16 }}>{error}</div>}
