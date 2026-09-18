@@ -188,10 +188,13 @@ export default function StudyPackView() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('summary');
   const [reprocessing, setReprocessing] = useState(false);
+  const [shareToken, setShareToken] = useState(null);
+  const [shareLoading, setShareLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     api.getStudyPack(id)
-      .then(({ pack }) => setPack(pack))
+      .then(({ pack }) => { setPack(pack); setShareToken(pack.shareToken || null); })
       .catch(() => navigate('/dashboard'))
       .finally(() => setLoading(false));
   }, [id, navigate]);
@@ -207,6 +210,39 @@ export default function StudyPackView() {
     } finally {
       setReprocessing(false);
     }
+  };
+
+  const enableShare = async () => {
+    setShareLoading(true);
+    try {
+      const { shareToken } = await api.createShareLink(id);
+      setShareToken(shareToken);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setShareLoading(false);
+    }
+  };
+
+  const disableShare = async () => {
+    if (!window.confirm('Stop sharing this study pack? The link will stop working.')) return;
+    setShareLoading(true);
+    try {
+      await api.revokeShareLink(id);
+      setShareToken(null);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setShareLoading(false);
+    }
+  };
+
+  const shareUrl = shareToken ? `${window.location.origin}/share/${shareToken}` : null;
+
+  const copyShareLink = () => {
+    navigator.clipboard.writeText(shareUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const downloadPdf = () => {
@@ -280,12 +316,23 @@ export default function StudyPackView() {
             </p>
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <button className="btn btn-ghost btn-sm" onClick={shareToken ? disableShare : enableShare} disabled={shareLoading}>
+              {shareLoading ? '…' : shareToken ? '🔗 Sharing' : '🔗 Share'}
+            </button>
             <button className="btn btn-ghost btn-sm" onClick={downloadPdf}>⬇ PDF</button>
             <button className="btn btn-ghost btn-sm" onClick={handleReprocess} disabled={reprocessing}>
               {reprocessing ? '…' : '↺ Regenerate'}
             </button>
           </div>
         </div>
+
+        {shareToken && (
+          <div className="card" style={{ marginBottom: 20, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 13, color: 'var(--gray-500)' }}>Public link:</span>
+            <code style={{ fontSize: 13, color: 'var(--indigo-500)', flex: 1, minWidth: 200, wordBreak: 'break-all' }}>{shareUrl}</code>
+            <button className="btn btn-ghost btn-sm" onClick={copyShareLink}>{copied ? '✓ Copied' : 'Copy'}</button>
+          </div>
+        )}
 
         <div className="tabs" style={{ marginBottom: 20 }}>
           {TABS.map(t => (
