@@ -11,6 +11,7 @@ const uploadRoutes = require('./routes/upload');
 const processRoutes = require('./routes/process');
 const emailRoutes = require('./routes/email');
 const historyRoutes = require('./routes/history');
+const shareRoutes = require('./routes/share');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
