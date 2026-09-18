@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import jsPDF from 'jspdf';
 import { api } from '../utils/api';
 
 function Summary({ text }) {
@@ -73,10 +74,15 @@ function Flashcards({ cards }) {
 function Quiz({ questions }) {
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [retaking, setRetaking] = useState(false);
 
   const score = submitted
     ? questions.filter((q, i) => answers[i] === q.correctIndex).length
     : 0;
+
+  const missedQuestions = submitted
+    ? questions.filter((q, i) => answers[i] !== q.correctIndex)
+    : [];
 
   const pick = (qi, oi) => {
     if (submitted) return;
@@ -144,13 +150,32 @@ function Quiz({ questions }) {
           Submit Quiz ({Object.keys(answers).length}/{questions.length} answered)
         </button>
       ) : (
-        <button
-          className="btn btn-ghost"
-          style={{ marginTop: 20, width: '100%' }}
-          onClick={() => { setAnswers({}); setSubmitted(false); }}
-        >
-          Retake Quiz
-        </button>
+        <>
+          <button
+            className="btn btn-ghost"
+            style={{ marginTop: 20, width: '100%' }}
+            onClick={() => { setAnswers({}); setSubmitted(false); setRetaking(false); }}
+          >
+            Retake Quiz
+          </button>
+
+          {missedQuestions.length > 0 && !retaking && (
+            <button
+              className="btn btn-primary"
+              style={{ marginTop: 10, width: '100%' }}
+              onClick={() => setRetaking(true)}
+            >
+              Retake missed questions ({missedQuestions.length})
+            </button>
+          )}
+
+          {retaking && (
+            <div style={{ marginTop: 24, paddingTop: 24, borderTop: '1px solid var(--gray-200)' }}>
+              <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Retake: missed questions</h3>
+              <Quiz questions={missedQuestions} />
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -184,6 +209,48 @@ export default function StudyPackView() {
     }
   };
 
+  const downloadPdf = () => {
+    const doc = new jsPDF();
+    const pageWidth = 180;
+    let y = 20;
+
+    const addWrapped = (text, fontSize = 11, isBold = false) => {
+      doc.setFontSize(fontSize);
+      doc.setFont(undefined, isBold ? 'bold' : 'normal');
+      const lines = doc.splitTextToSize(text, pageWidth);
+      lines.forEach(line => {
+        if (y > 280) { doc.addPage(); y = 20; }
+        doc.text(line, 15, y);
+        y += fontSize * 0.5;
+      });
+      y += 4;
+    };
+
+    addWrapped(pack.title, 18, true);
+    addWrapped('Summary', 14, true);
+    addWrapped(pack.summary || '');
+
+    addWrapped('Key Points', 14, true);
+    (pack.keyPoints || []).forEach((kp, i) => addWrapped(`${i + 1}. ${kp}`));
+
+    addWrapped('Flashcards', 14, true);
+    (pack.flashcards || []).forEach((fc, i) => {
+      addWrapped(`Q${i + 1}: ${fc.question}`, 11, true);
+      addWrapped(`A: ${fc.answer}`);
+    });
+
+    addWrapped('Quiz', 14, true);
+    (pack.quiz || []).forEach((q, i) => {
+      addWrapped(`${i + 1}. ${q.question}`, 11, true);
+      q.options.forEach((opt, oi) => {
+        const marker = oi === q.correctIndex ? ' (correct)' : '';
+        addWrapped(`${String.fromCharCode(65 + oi)}. ${opt}${marker}`);
+      });
+    });
+
+    doc.save(`${pack.title.replace(/[^a-z0-9]/gi, '_')}.pdf`);
+  };
+
   if (loading) return <div className="loading-center"><div className="spinner" /></div>;
   if (!pack) return null;
 
@@ -207,11 +274,13 @@ export default function StudyPackView() {
             </button>
             <h1 style={{ fontSize: 24, fontWeight: 800 }}>{pack.title}</h1>
             <p style={{ color: 'var(--gray-500)', fontSize: 13, marginTop: 4 }}>
+              {pack.subject && <>{pack.subject} · </>}
               {pack.flashcards?.length} flashcards · {pack.quiz?.length} quiz questions ·{' '}
               Uploaded {new Date(pack.createdAt).toLocaleDateString()}
             </p>
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <button className="btn btn-ghost btn-sm" onClick={downloadPdf}>⬇ PDF</button>
             <button className="btn btn-ghost btn-sm" onClick={handleReprocess} disabled={reprocessing}>
               {reprocessing ? '…' : '↺ Regenerate'}
             </button>
