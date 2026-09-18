@@ -20,17 +20,14 @@ const request = async (path, options = {}) => {
 };
 
 export const api = {
-  // Auth
   signup: (body) => request('/auth/signup', { method: 'POST', body: JSON.stringify(body) }),
   login: (body) => request('/auth/login', { method: 'POST', body: JSON.stringify(body) }),
   me: () => request('/auth/me'),
 
-  // Payment
   createCheckout: () => request('/payment/create-checkout-session', { method: 'POST' }),
   createPortal: () => request('/payment/create-portal-session', { method: 'POST' }),
   subscriptionStatus: () => request('/payment/subscription-status'),
 
-  // Upload
   upload: (formData) => {
     const token = getToken();
     return fetch(`${BASE_URL}/upload`, {
@@ -44,15 +41,16 @@ export const api = {
     });
   },
 
-  // Process
   reprocess: (id) => request(`/process/${id}`, { method: 'POST' }),
   processStatus: (id) => request(`/process/${id}/status`),
 
-  // Email
   sendEmail: (id, email) => request(`/email/send/${id}`, { method: 'POST', body: JSON.stringify({ email }) }),
 
-  // History
   history: (page = 1) => request(`/history?page=${page}`),
   getStudyPack: (id) => request(`/history/${id}`),
-  deleteStudyPack: (id) => request(`/history/${id}`, { method: 'DELETE' })
+  deleteStudyPack: (id) => request(`/history/${id}`, { method: 'DELETE' }),
+  createShareLink: (id) => request(`/history/${id}/share`, { method: 'POST' }),
+  revokeShareLink: (id) => request(`/history/${id}/share`, { method: 'DELETE' }),
+
+  getSharedPack: (token) => request(`/share/${token}`)
 };
