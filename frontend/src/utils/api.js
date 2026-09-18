@@ -23,6 +23,8 @@ export const api = {
   signup: (body) => request('/auth/signup', { method: 'POST', body: JSON.stringify(body) }),
   login: (body) => request('/auth/login', { method: 'POST', body: JSON.stringify(body) }),
   me: () => request('/auth/me'),
+  updateProfile: (body) => request('/auth/me', { method: 'PUT', body: JSON.stringify(body) }),
+  changePassword: (body) => request('/auth/password', { method: 'PUT', body: JSON.stringify(body) }),
 
   createCheckout: () => request('/payment/create-checkout-session', { method: 'POST' }),
   createPortal: () => request('/payment/create-portal-session', { method: 'POST' }),
