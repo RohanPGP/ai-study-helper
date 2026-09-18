@@ -15,6 +15,7 @@ export default function Dashboard() {
   const [packs, setPacks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(null);
+  const [subjectFilter, setSubjectFilter] = useState('All');
 
   const loadPacks = useCallback(async () => {
     try {
@@ -29,7 +30,6 @@ export default function Dashboard() {
 
   useEffect(() => { loadPacks(); }, [loadPacks]);
 
-  // Poll for processing packs
   useEffect(() => {
     const processing = packs.filter(p => p.status === 'processing');
     if (processing.length === 0) return;
@@ -50,10 +50,12 @@ export default function Dashboard() {
     }
   };
 
+  const subjects = ['All', ...Array.from(new Set(packs.map(p => p.subject).filter(Boolean)))];
+  const filteredPacks = subjectFilter === 'All' ? packs : packs.filter(p => p.subject === subjectFilter);
+
   return (
     <div className="page">
       <div className="container">
-        {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
           <div>
             <h1 style={{ fontSize: 28, fontWeight: 800 }}>Welcome back, {user?.name?.split(' ')[0]} 👋</h1>
@@ -63,8 +65,21 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Study packs */}
         <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>Your Study Packs</h2>
+
+        {subjects.length > 1 && (
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+            {subjects.map(s => (
+              <button
+                key={s}
+                onClick={() => setSubjectFilter(s)}
+                className={`btn btn-sm ${subjectFilter === s ? 'btn-primary' : 'btn-ghost'}`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
 
         {loading ? (
           <div className="loading-center"><div className="spinner" /></div>
@@ -76,15 +91,20 @@ export default function Dashboard() {
               Upload your first file
             </Link>
           </div>
+        ) : filteredPacks.length === 0 ? (
+          <div className="card" style={{ textAlign: 'center', padding: 60, color: 'var(--gray-500)' }}>
+            <p style={{ fontSize: 16, fontWeight: 500 }}>No study packs in "{subjectFilter}" yet.</p>
+          </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            {packs.map(pack => (
+            {filteredPacks.map(pack => (
               <div key={pack._id} className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: 200 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
                     <span style={{ fontSize: 18 }}>📄</span>
                     <h3 style={{ fontSize: 15, fontWeight: 700 }}>{pack.title}</h3>
                     {statusBadge(pack.status)}
+                    {pack.subject && <span className="badge badge-inactive">{pack.subject}</span>}
                   </div>
                   <p style={{ fontSize: 13, color: 'var(--gray-500)' }}>
                     {pack.flashcards?.length || 0} flashcards · {pack.quiz?.length || 0} quiz questions ·{' '}
