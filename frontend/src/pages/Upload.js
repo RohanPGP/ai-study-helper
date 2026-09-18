@@ -6,7 +6,7 @@ export default function Upload() {
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState('');
   const [subject, setSubject] = useState('');
-  const [difficulty, setDifficulty] = useState('medium');
+  const [difficulty, setDifficulty] = useState(() => localStorage.getItem('defaultDifficulty') || 'medium');
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
