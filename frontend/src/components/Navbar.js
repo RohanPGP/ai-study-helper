@@ -1,11 +1,8 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => { logout(); navigate('/login'); };
+  const { user } = useAuth();
 
   return (
     <nav className="navbar">
@@ -23,7 +20,6 @@ export default function Navbar() {
               <Link to="/tools" className="btn btn-ghost btn-sm">Tools</Link>
               <Link to="/guide" className="btn btn-ghost btn-sm">Guide</Link>
               <Link to="/settings" className="btn btn-ghost btn-sm">Settings</Link>
-              <button onClick={handleLogout} className="btn btn-ghost btn-sm">Logout</button>
             </>
           ) : (
             <>
