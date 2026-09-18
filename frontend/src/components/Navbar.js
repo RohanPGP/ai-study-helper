@@ -21,6 +21,8 @@ export default function Navbar() {
               <Link to="/dashboard" className="btn btn-ghost btn-sm">Dashboard</Link>
               <Link to="/upload" className="btn btn-ghost btn-sm">Upload</Link>
               <Link to="/tools" className="btn btn-ghost btn-sm">Tools</Link>
+              <Link to="/guide" className="btn btn-ghost btn-sm">Guide</Link>
+              <Link to="/settings" className="btn btn-ghost btn-sm">Settings</Link>
               <button onClick={handleLogout} className="btn btn-ghost btn-sm">Logout</button>
             </>
           ) : (
