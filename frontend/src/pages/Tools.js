@@ -54,17 +54,23 @@ function GradeCalculator() {
           Enter each assignment's grade and weight to find your current overall grade.
         </p>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ display: 'flex', gap: 10, fontSize: 12, fontWeight: 600, color: 'var(--gray-500)', padding: '0 2px' }}>
-            <span style={{ flex: 3 }}>Assignment (optional)</span>
-            <span style={{ flex: 1 }}>Grade</span>
-            <span style={{ flex: 1 }}>Weight %</span>
-          </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {rows.map((r, i) => (
-            <div key={i} style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              <input className="input" style={{ flex: 3, minWidth: 140 }} placeholder="e.g. Homework 1" value={r.name} onChange={e => updateRow(i, 'name', e.target.value)} />
-              <input className="input" style={{ flex: 1, minWidth: 70 }} type="number" placeholder="91" value={r.grade} onChange={e => updateRow(i, 'grade', e.target.value)} />
-              <input className="input" style={{ flex: 1, minWidth: 70 }} type="number" placeholder="10" value={r.weight} onChange={e => updateRow(i, 'weight', e.target.value)} />
+            <div key={i} className="calc-row">
+              <div className="form-group calc-row-name">
+                <label className="label">Assignment (optional)</label>
+                <input className="input" placeholder="e.g. Homework 1" value={r.name} onChange={e => updateRow(i, 'name', e.target.value)} />
+              </div>
+              <div className="calc-row-rest">
+                <div className="form-group">
+                  <label className="label">Grade</label>
+                  <input className="input" type="number" placeholder="91" value={r.grade} onChange={e => updateRow(i, 'grade', e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label className="label">Weight %</label>
+                  <input className="input" type="number" placeholder="10" value={r.weight} onChange={e => updateRow(i, 'weight', e.target.value)} />
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -188,24 +194,32 @@ function GpaCalculator() {
         on a 5.0 scale; ACA courses use the standard 4.0 scale.
       </p>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <div style={{ display: 'flex', gap: 10, fontSize: 12, fontWeight: 600, color: 'var(--gray-500)', padding: '0 2px' }}>
-          <span style={{ flex: 3 }}>Course (optional)</span>
-          <span style={{ flex: 1 }}>Type</span>
-          <span style={{ flex: 1 }}>Grade</span>
-          <span style={{ flex: 1 }}>Credits</span>
-        </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {rows.map((r, i) => (
-          <div key={i} style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            <input className="input" style={{ flex: 3, minWidth: 140 }} placeholder="e.g. Algebra II" value={r.name} onChange={e => updateRow(i, 'name', e.target.value)} />
-            <select className="input" style={{ flex: 1, minWidth: 80 }} value={r.type} onChange={e => updateRow(i, 'type', e.target.value)}>
-              <option value="">Type</option>
-              <option value="AP">AP</option>
-              <option value="KAP">KAP</option>
-              <option value="ACA">ACA</option>
-            </select>
-            <input className="input" style={{ flex: 1, minWidth: 70 }} type="number" placeholder="95" value={r.grade} onChange={e => updateRow(i, 'grade', e.target.value)} />
-            <input className="input" style={{ flex: 1, minWidth: 70 }} type="number" placeholder="3" value={r.credits} onChange={e => updateRow(i, 'credits', e.target.value)} />
+          <div key={i} className="calc-row">
+            <div className="form-group calc-row-name">
+              <label className="label">Course (optional)</label>
+              <input className="input" placeholder="e.g. Algebra II" value={r.name} onChange={e => updateRow(i, 'name', e.target.value)} />
+            </div>
+            <div className="calc-row-rest">
+              <div className="form-group">
+                <label className="label">Type</label>
+                <select className="input" value={r.type} onChange={e => updateRow(i, 'type', e.target.value)}>
+                  <option value="">—</option>
+                  <option value="AP">AP</option>
+                  <option value="KAP">KAP</option>
+                  <option value="ACA">ACA</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="label">Grade</label>
+                <input className="input" type="number" placeholder="95" value={r.grade} onChange={e => updateRow(i, 'grade', e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label className="label">Credits</label>
+                <input className="input" type="number" placeholder="3" value={r.credits} onChange={e => updateRow(i, 'credits', e.target.value)} />
+              </div>
+            </div>
           </div>
         ))}
       </div>
