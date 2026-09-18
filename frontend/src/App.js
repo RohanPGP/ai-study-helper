@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -18,6 +19,15 @@ import './styles/global.css';
 
 function AppRoutes() {
   const { user, loading } = useAuth();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (window.gtag) {
+      window.gtag('event', 'page_view', {
+        page_path: location.pathname + location.search
+      });
+    }
+  }, [location]);
 
   if (loading) return <div className="loading-center"><div className="spinner" /></div>;
 
