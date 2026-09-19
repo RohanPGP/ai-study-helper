@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Upload from './pages/Upload';
+import CameraCapture from './pages/CameraCapture';
 import StudyPackView from './pages/StudyPackView';
 import About from './pages/About';
 import Tools from './pages/Tools';
@@ -48,6 +49,9 @@ function AppRoutes() {
         } />
         <Route path="/upload" element={
           <ProtectedRoute><Upload /></ProtectedRoute>
+        } />
+        <Route path="/camera" element={
+          <ProtectedRoute><CameraCapture /></ProtectedRoute>
         } />
         <Route path="/study-pack/:id" element={
           <ProtectedRoute><StudyPackView /></ProtectedRoute>
