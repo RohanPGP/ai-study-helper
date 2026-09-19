@@ -240,13 +240,24 @@ export default function StudyPackView() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('summary');
   const [reprocessing, setReprocessing] = useState(false);
+
   const [shareToken, setShareToken] = useState(null);
+  const [showCreator, setShowCreator] = useState(false);
   const [shareLoading, setShareLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  const [editing, setEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editSubject, setEditSubject] = useState('');
+  const [editSaving, setEditSaving] = useState(false);
+
   useEffect(() => {
     api.getStudyPack(id)
-      .then(({ pack }) => { setPack(pack); setShareToken(pack.shareToken || null); })
+      .then(({ pack }) => {
+        setPack(pack);
+        setShareToken(pack.shareToken || null);
+        setShowCreator(!!pack.shareShowCreator);
+      })
       .catch(() => navigate('/dashboard'))
       .finally(() => setLoading(false));
   }, [id, navigate]);
@@ -264,10 +275,10 @@ export default function StudyPackView() {
     }
   };
 
-  const enableShare = async () => {
+  const enableShare = async (creatorPref) => {
     setShareLoading(true);
     try {
-      const { shareToken } = await api.createShareLink(id);
+      const { shareToken } = await api.createShareLink(id, creatorPref);
       setShareToken(shareToken);
     } catch (err) {
       alert(err.message);
@@ -289,12 +300,43 @@ export default function StudyPackView() {
     }
   };
 
+  const toggleShowCreator = async (checked) => {
+    setShowCreator(checked);
+    if (shareToken) {
+      try {
+        await api.createShareLink(id, checked);
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+  };
+
   const shareUrl = shareToken ? `${window.location.origin}/share/${shareToken}` : null;
 
   const copyShareLink = () => {
     navigator.clipboard.writeText(shareUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const startEdit = () => {
+    setEditTitle(pack.title);
+    setEditSubject(pack.subject || '');
+    setEditing(true);
+  };
+
+  const saveEdit = async () => {
+    if (!editTitle.trim()) { alert('Title cannot be empty.'); return; }
+    setEditSaving(true);
+    try {
+      const { pack: updated } = await api.updateStudyPack(id, { title: editTitle.trim(), subject: editSubject.trim() });
+      setPack(p => ({ ...p, title: updated.title, subject: updated.subject }));
+      setEditing(false);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setEditSaving(false);
+    }
   };
 
   const downloadPdf = () => {
@@ -353,22 +395,39 @@ export default function StudyPackView() {
     <div className="page">
       <div className="container" style={{ maxWidth: 800 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
-          <div>
+          <div style={{ flex: 1, minWidth: 240 }}>
             <button
               onClick={() => navigate('/dashboard')}
               style={{ background: 'none', border: 'none', color: 'var(--indigo-500)', fontWeight: 600, fontSize: 14, cursor: 'pointer', marginBottom: 8 }}
             >
               ← Dashboard
             </button>
-            <h1 style={{ fontSize: 24, fontWeight: 800 }}>{pack.title}</h1>
-            <p style={{ color: 'var(--gray-500)', fontSize: 13, marginTop: 4 }}>
-              {pack.subject && <>{pack.subject} · </>}
-              {pack.flashcards?.length} flashcards · {pack.quiz?.length} quiz questions ·{' '}
-              Uploaded {new Date(pack.createdAt).toLocaleDateString()}
-            </p>
+
+            {editing ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 380 }}>
+                <input className="input" value={editTitle} onChange={e => setEditTitle(e.target.value)} placeholder="Title" maxLength={200} />
+                <input className="input" value={editSubject} onChange={e => setEditSubject(e.target.value)} placeholder="Subject (optional)" maxLength={100} />
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button className="btn btn-primary btn-sm" onClick={saveEdit} disabled={editSaving}>
+                    {editSaving ? 'Saving…' : 'Save'}
+                  </button>
+                  <button className="btn btn-ghost btn-sm" onClick={() => setEditing(false)}>Cancel</button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <h1 style={{ fontSize: 24, fontWeight: 800 }}>{pack.title}</h1>
+                <p style={{ color: 'var(--gray-500)', fontSize: 13, marginTop: 4 }}>
+                  {pack.subject && <>{pack.subject} · </>}
+                  {pack.flashcards?.length} flashcards · {pack.quiz?.length} quiz questions ·{' '}
+                  Uploaded {new Date(pack.createdAt).toLocaleDateString()}
+                </p>
+                <button className="btn btn-ghost btn-sm" onClick={startEdit} style={{ marginTop: 8 }}>✏️ Edit name/tag</button>
+              </>
+            )}
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <button className="btn btn-ghost btn-sm" onClick={shareToken ? disableShare : enableShare} disabled={shareLoading}>
+            <button className="btn btn-ghost btn-sm" onClick={shareToken ? disableShare : () => enableShare(showCreator)} disabled={shareLoading}>
               {shareLoading ? '…' : shareToken ? '🔗 Sharing' : '🔗 Share'}
             </button>
             <button className="btn btn-ghost btn-sm" onClick={downloadPdf}>⬇ PDF</button>
@@ -378,13 +437,24 @@ export default function StudyPackView() {
           </div>
         </div>
 
-        {shareToken && (
-          <div className="card" style={{ marginBottom: 20, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 13, color: 'var(--gray-500)' }}>Public link:</span>
-            <code style={{ fontSize: 13, color: 'var(--indigo-500)', flex: 1, minWidth: 200, wordBreak: 'break-all' }}>{shareUrl}</code>
-            <button className="btn btn-ghost btn-sm" onClick={copyShareLink}>{copied ? '✓ Copied' : 'Copy'}</button>
-          </div>
-        )}
+        <div className="card" style={{ marginBottom: 20, padding: '14px 18px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--gray-700)', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={showCreator}
+              onChange={e => toggleShowCreator(e.target.checked)}
+              style={{ width: 15, height: 15, accentColor: 'var(--indigo-600)' }}
+            />
+            Include my name as creator on the shared link
+          </label>
+          {shareToken && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginTop: 10 }}>
+              <span style={{ fontSize: 13, color: 'var(--gray-500)' }}>Public link:</span>
+              <code style={{ fontSize: 13, color: 'var(--indigo-500)', flex: 1, minWidth: 200, wordBreak: 'break-all' }}>{shareUrl}</code>
+              <button className="btn btn-ghost btn-sm" onClick={copyShareLink}>{copied ? '✓ Copied' : 'Copy'}</button>
+            </div>
+          )}
+        </div>
 
         <div className="tabs" style={{ marginBottom: 20 }}>
           {TABS.map(t => (
