@@ -16,6 +16,8 @@ import Tools from './pages/Tools';
 import SharedStudyPack from './pages/SharedStudyPack';
 import Settings from './pages/Settings';
 import Guide from './pages/Guide';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 import './styles/global.css';
 
 function AppRoutes() {
@@ -40,6 +42,8 @@ function AppRoutes() {
         <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
         <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <Signup />} />
         <Route path="/about" element={<About />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="/tools" element={<Tools />} />
         <Route path="/share/:token" element={<SharedStudyPack />} />
 
