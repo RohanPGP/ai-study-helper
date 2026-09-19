@@ -193,7 +193,12 @@ export default function SharedStudyPack() {
           <Link to="/signup" className="btn btn-primary btn-sm">Create your own study packs →</Link>
         </div>
 
-        <div style={{ marginBottom: 24 }}>
+               <div style={{ marginBottom: 24 }}>
+          {pack.creatorName && (
+            <p style={{ color: 'var(--indigo-500)', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
+              {pack.creatorName}'s study pack
+            </p>
+          )}
           <h1 style={{ fontSize: 24, fontWeight: 800 }}>{pack.title}</h1>
           <p style={{ color: 'var(--gray-500)', fontSize: 13, marginTop: 4 }}>
             {pack.subject && <>{pack.subject} · </>}
