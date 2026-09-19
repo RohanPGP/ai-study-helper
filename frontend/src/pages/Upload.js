@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { api } from '../utils/api';
 
 export default function Upload() {
@@ -76,6 +76,7 @@ export default function Upload() {
           <p style={{ color: 'var(--gray-500)', marginTop: 4 }}>
             Upload a PDF, Word doc, or text file. AI will generate your study pack in ~30 seconds.
           </p>
+          <Link to="/camera" className="btn btn-ghost btn-sm" style={{ marginTop: 12 }}>📷 Or scan with camera</Link>
         </div>
 
         <form onSubmit={handleSubmit}>
