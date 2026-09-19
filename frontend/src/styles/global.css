@@ -162,26 +162,24 @@ button { cursor: pointer; font-family: inherit; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  row-gap: 8px;
-  min-height: 64px;
-  padding: 10px 0;
+  flex-wrap: nowrap;
+  gap: 12px;
+  height: 64px;
 }
 .navbar-brand { font-size: 20px; font-weight: 800; color: var(--indigo-500); display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .navbar-logo { width: 28px; height: 28px; flex-shrink: 0; }
-.navbar-links { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.navbar-toggle {
-  display: none;
-  background: none;
-  border: none;
-  color: var(--gray-900);
-  font-size: 22px;
-  line-height: 1;
-  cursor: pointer;
-  padding: 6px 8px;
-  border-radius: var(--radius-sm);
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  min-width: 0;
 }
-.navbar-toggle:hover { background: var(--gray-100); }
+.navbar-links::-webkit-scrollbar { display: none; }
+.navbar-links .btn { flex-shrink: 0; }
 
 .page { min-height: calc(100vh - 64px); padding: 40px 0 80px; overflow-x: hidden; }
 
@@ -258,23 +256,10 @@ button { cursor: pointer; font-family: inherit; }
   .card { padding: 20px; }
   .btn-lg { width: 100%; }
 
-  .navbar-toggle { display: block; }
-  .navbar-links {
-    display: none;
-    width: 100%;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-    padding-top: 12px;
+    .navbar-links .btn {
+    padding: 6px 10px;
+    font-size: 12px;
   }
-  .navbar-links.open { display: flex; }
-  .navbar-links .btn {
-    width: 100%;
-    justify-content: center;
-    padding: 10px 14px;
-    font-size: 14px;
-  }
-
   .tab { font-size: 11px; padding: 8px 6px; }
 
   .calc-row { flex-direction: column; }
