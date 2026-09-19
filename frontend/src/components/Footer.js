@@ -7,7 +7,11 @@ export default function Footer() {
         <p style={{ fontSize: 13, color: 'var(--gray-500)' }}>
           © {new Date().getFullYear()} Rohan Sharma. All rights reserved.
         </p>
-        <Link to="/about" style={{ fontSize: 13, color: 'var(--indigo-500)', fontWeight: 600 }}>About</Link>
+        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+          <Link to="/about" style={{ fontSize: 13, color: 'var(--indigo-500)', fontWeight: 600 }}>About</Link>
+          <Link to="/terms" style={{ fontSize: 13, color: 'var(--indigo-500)', fontWeight: 600 }}>Terms</Link>
+          <Link to="/privacy" style={{ fontSize: 13, color: 'var(--indigo-500)', fontWeight: 600 }}>Privacy</Link>
+        </div>
       </div>
     </footer>
   );
