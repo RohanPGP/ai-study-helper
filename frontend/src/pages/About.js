@@ -6,7 +6,7 @@ export default function About() {
           <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16 }}>About TutorPulseAI</h1>
 
           <p style={{ color: 'var(--gray-700)', lineHeight: 1.8, marginBottom: 24 }}>
-            TutorPulseAI turns any homework file — a PDF, Word doc, or text file — into a
+            TutorPulseAI turns any homework file (a PDF, Word doc, or text file) into a
             complete study pack in seconds. Upload your material and get an AI-generated summary,
             key points, flashcards, and a quiz, all built to help you study smarter and review faster.
           </p>
