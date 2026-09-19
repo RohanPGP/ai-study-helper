@@ -23,6 +23,7 @@ const studyPackSchema = new mongoose.Schema({
   subject: { type: String, default: '', trim: true, maxlength: 100 },
   difficulty: { type: String, enum: ['easy', 'medium', 'hard'], default: 'medium' },
   shareToken: { type: String, default: null, index: true },
+  shareShowCreator: { type: Boolean, default: false },
   originalFilename: { type: String, required: true },
   fileType: { type: String, enum: ['pdf', 'docx', 'txt', 'image'] },
   extractedText: { type: String, select: false }, // large field, omit by default
