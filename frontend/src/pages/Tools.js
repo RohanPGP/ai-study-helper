@@ -58,7 +58,7 @@ function GradeCalculator() {
           {rows.map((r, i) => (
             <div key={i} className="calc-row">
               <div className="form-group calc-row-name">
-                <label className="label">Assignment (optional)</label>
+                <label className="label"><b>Assignment (optional)</b></label>
                 <input className="input" placeholder="e.g. Homework 1" value={r.name} onChange={e => updateRow(i, 'name', e.target.value)} />
               </div>
               <div className="calc-row-rest">
@@ -198,7 +198,7 @@ function GpaCalculator() {
         {rows.map((r, i) => (
           <div key={i} className="calc-row">
             <div className="form-group calc-row-name">
-              <label className="label">Course (optional)</label>
+              <label className="label"><b>Course (optional)</b></label>
               <input className="input" placeholder="e.g. Algebra II" value={r.name} onChange={e => updateRow(i, 'name', e.target.value)} />
             </div>
             <div className="calc-row-rest">
