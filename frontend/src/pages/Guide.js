@@ -28,7 +28,7 @@ export default function Guide() {
 
         <Section title="📤 Uploading homework" items={[
           'Go to <strong>Upload</strong> and drop in a PDF, Word doc, or text file (max 10 MB).',
-          'Or use <strong>📷 Scan with camera</strong> to photograph physical pages instead.',
+          'Or use <strong>📷 Scan with camera</strong> to photograph physical pages instead (up to 10 photos).',
           'Optional: add a title and subject to keep things organized.',
           'Pick a quiz difficulty — Easy, Medium, or Hard.',
           'Takes about 30 seconds to generate.'
@@ -39,13 +39,15 @@ export default function Guide() {
           '<strong>Key Points</strong> — condensed takeaways.',
           '<strong>Flashcards</strong> — click to flip.',
           '<strong>Quiz</strong> — score + explanations after submitting.',
-          'Missed a question? Hit <strong>"Retake missed questions"</strong> to redo just those.'
+          'Missed a question? Hit <strong>"Retake missed questions"</strong> to redo just those.',
+          'Click <strong>✏️ Edit name/tag</strong> to rename a study pack or change its subject anytime.'
         ]} />
 
         <Section title="🔗 Sharing" items={[
           'Click <strong>🔗 Share</strong> on any study pack for a public, read-only link.',
           'Anyone with the link can view it and take the quiz — no account needed.',
-          'Click it again anytime to disable the link.'
+          'Check <strong>"Include my name as creator"</strong> if you want visitors to see it\'s your pack (e.g. "Jane\'s study pack"). Leave it unchecked to stay anonymous.',
+          'Click Share again anytime to disable the link.'
         ]} />
 
         <Section title="⬇ Exporting" items={[
@@ -69,6 +71,13 @@ export default function Guide() {
           'Set a default quiz difficulty for uploads.',
           'Update your display name or password.',
           'Logout lives here too, at the bottom.'
+        ]} />
+
+        <Section title="📏 Limits" items={[
+          'File uploads: 10 MB max, PDF/DOCX/TXT only.',
+          'Camera scans: up to 10 photos per scan, 10 MB each.',
+          'Only the first ~12,000 characters of extracted text are processed — about 4-8 pages or 2,000-2,500 words. Best for a chapter, worksheet, or article, not a whole textbook at once.',
+          'No cap on number of study packs — free and unlimited.'
         ]} />
       </div>
     </div>
