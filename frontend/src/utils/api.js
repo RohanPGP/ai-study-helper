@@ -63,8 +63,9 @@ export const api = {
 
   history: (page = 1) => request(`/history?page=${page}`),
   getStudyPack: (id) => request(`/history/${id}`),
+  updateStudyPack: (id, body) => request(`/history/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
   deleteStudyPack: (id) => request(`/history/${id}`, { method: 'DELETE' }),
-  createShareLink: (id) => request(`/history/${id}/share`, { method: 'POST' }),
+  createShareLink: (id, showCreator) => request(`/history/${id}/share`, { method: 'POST', body: JSON.stringify({ showCreator }) }),
   revokeShareLink: (id) => request(`/history/${id}/share`, { method: 'DELETE' }),
 
   getSharedPack: (token) => request(`/share/${token}`)
