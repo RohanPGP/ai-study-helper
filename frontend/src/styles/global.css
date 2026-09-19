@@ -256,9 +256,25 @@ button { cursor: pointer; font-family: inherit; }
   .card { padding: 20px; }
   .btn-lg { width: 100%; }
 
-    .navbar-links .btn {
-    padding: 6px 10px;
-    font-size: 12px;
+  .navbar-inner {
+    flex-direction: column;
+    align-items: stretch;
+    height: auto;
+    padding: 10px 0;
+    gap: 8px;
+  }
+  .navbar-links {
+    width: 100%;
+    overflow-x: hidden;
+  }
+  .navbar-links .btn {
+    flex: 1;
+    min-width: 0;
+    padding: 6px 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .tab { font-size: 11px; padding: 8px 6px; }
 
