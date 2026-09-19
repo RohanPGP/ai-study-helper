@@ -3,6 +3,54 @@ import { useParams, useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import { api } from '../utils/api';
 
+function fireConfetti() {
+  const canvas = document.createElement('canvas');
+  canvas.style.position = 'fixed';
+  canvas.style.inset = '0';
+  canvas.style.pointerEvents = 'none';
+  canvas.style.zIndex = '9999';
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+
+  const colors = ['#4f46e5', '#7c3aed', '#10b981', '#f59e0b', '#ef4444'];
+  const particles = Array.from({ length: 120 }, () => ({
+    x: canvas.width / 2,
+    y: canvas.height / 3,
+    vx: (Math.random() - 0.5) * 12,
+    vy: Math.random() * -12 - 4,
+    size: Math.random() * 6 + 4,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    rotation: Math.random() * 360,
+    rotationSpeed: (Math.random() - 0.5) * 10
+  }));
+
+  let frame = 0;
+  function animate() {
+    frame++;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.vy += 0.35;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rotation += p.rotationSpeed;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rotation * Math.PI) / 180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+      ctx.restore();
+    });
+    if (frame < 100) {
+      requestAnimationFrame(animate);
+    } else {
+      document.body.removeChild(canvas);
+    }
+  }
+  animate();
+}
+
 function Summary({ text }) {
   return (
     <div className="card">
@@ -144,7 +192,11 @@ function Quiz({ questions }) {
         <button
           className="btn btn-primary"
           style={{ marginTop: 28, width: '100%' }}
-          onClick={() => setSubmitted(true)}
+          onClick={() => {
+            const finalScore = questions.filter((q, i) => answers[i] === q.correctIndex).length;
+            setSubmitted(true);
+            if (finalScore / questions.length >= 0.7) fireConfetti();
+          }}
           disabled={Object.keys(answers).length < questions.length}
         >
           Submit Quiz ({Object.keys(answers).length}/{questions.length} answered)
