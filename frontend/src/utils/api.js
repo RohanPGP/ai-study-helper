@@ -43,6 +43,19 @@ export const api = {
     });
   },
 
+  uploadImages: (formData) => {
+    const token = getToken();
+    return fetch(`${BASE_URL}/upload/camera`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData
+    }).then(async r => {
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || 'Upload failed');
+      return d;
+    });
+  },
+
   reprocess: (id) => request(`/process/${id}`, { method: 'POST' }),
   processStatus: (id) => request(`/process/${id}/status`),
 
