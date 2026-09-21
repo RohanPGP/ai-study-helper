@@ -1,4 +1,10 @@
+import { usePageMeta } from '../hooks/usePageMeta';
+
 export default function About() {
+  usePageMeta(
+    'About – TutorPulseAI',
+    'TutorPulseAI is a free AI study tool built by Rohan Sharma, a student at Jordan High School, to turn homework into summaries, flashcards, and quizzes.'
+  );
   return (
     <div className="page">
       <div className="container" style={{ maxWidth: 640 }}>
