@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 function GradeCalculator() {
   const [rows, setRows] = useState([
