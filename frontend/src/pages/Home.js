@@ -51,6 +51,10 @@ const FEATURES = [
 ];
 
 export default function Home() {
+  usePageMeta(
+    'TutorPulseAI – AI Homework & Study Pack Generator',
+    'Turn any homework file or photo into AI-generated summaries, flashcards, and quizzes. Free grade calculator, GPA calculator, and citation generator included.'
+  );
   const [stepsRef, stepsInView] = useInView();
   const [featuresRef, featuresInView] = useInView();
 
