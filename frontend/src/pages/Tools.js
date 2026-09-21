@@ -377,8 +377,11 @@ function CitationGenerator() {
 }
 
 export default function Tools() {
+  usePageMeta(
+    'Free Grade Calculator, GPA Calculator & Citation Generator – TutorPulseAI',
+    'Calculate your current grade, what you need on a final, your weighted GPA, or generate MLA/APA citations — all free, no account required.'
+  );
   const [activeTab, setActiveTab] = useState('grade');
-
   return (
     <div className="page">
       <div className="container" style={{ maxWidth: 700 }}>
