@@ -1,4 +1,10 @@
+import { usePageMeta } from '../hooks/usePageMeta';
+
 export default function Guide() {
+  usePageMeta(
+    'Guide – TutorPulseAI',
+    'How to use TutorPulseAI: uploading homework, camera scanning, sharing study packs, and the built-in grade, GPA, and citation tools.'
+  );
   const Section = ({ title, items }) => (
     <div className="card" style={{ marginBottom: 16 }}>
       <h2 style={{ fontSize: 17, fontWeight: 700, marginBottom: 12 }}>{title}</h2>
