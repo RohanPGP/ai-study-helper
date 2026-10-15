@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { api } from '../utils/api';
+import XPBar from '../components/XPBar';
 
 const statusBadge = (status) => ({
   ready:      <span className="badge badge-ready">✓ Ready</span>,
@@ -10,7 +11,7 @@ const statusBadge = (status) => ({
 }[status] || null);
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const navigate = useNavigate();
   const [packs, setPacks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,9 +34,12 @@ export default function Dashboard() {
   useEffect(() => {
     const processing = packs.filter(p => p.status === 'processing');
     if (processing.length === 0) return;
-    const timer = setInterval(loadPacks, 4000);
+    const timer = setInterval(() => {
+      loadPacks();
+      refreshUser();
+    }, 4000);
     return () => clearInterval(timer);
-  }, [packs, loadPacks]);
+  }, [packs, loadPacks, refreshUser]);
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this study pack?')) return;
@@ -56,7 +60,7 @@ export default function Dashboard() {
   return (
     <div className="page">
       <div className="container">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 16 }}>
           <div>
             <h1 style={{ fontSize: 28, fontWeight: 800 }}>Welcome back, {user?.name?.split(' ')[0]} 👋</h1>
           </div>
@@ -64,6 +68,8 @@ export default function Dashboard() {
             <Link to="/upload" className="btn btn-primary">+ Upload Homework</Link>
           </div>
         </div>
+
+        <XPBar user={user} />
 
         <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>Your Study Packs</h2>
 
