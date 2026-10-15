@@ -567,3 +567,25 @@ button { cursor: pointer; font-family: inherit; }
   .xp-card { padding: 12px 16px; gap: 10px; }
   .xp-card-top { min-width: 0; width: 100%; }
 }
+
+/* === Pulser mascot icon === */
+@keyframes pulserBlink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+.pulser-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulserBlink 4.5s infinite;
+}
+.pulser-antenna-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: streakPulse 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulser-eye, .pulser-antenna-dot {
+    animation: none !important;
+  }
+}
