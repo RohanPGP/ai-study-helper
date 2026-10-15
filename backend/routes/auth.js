@@ -2,9 +2,19 @@ const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
+const { levelFromXp, xpIntoLevel, touchStreak } = require('../utils/gamification');
 
 const signToken = (id, expiresIn) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: expiresIn || process.env.JWT_EXPIRES_IN || '7d' });
+
+const touchStreakIfNewDay = async (user) => {
+  const todayStr = new Date().toDateString();
+  const lastStr = user.lastActiveDate ? new Date(user.lastActiveDate).toDateString() : null;
+  if (lastStr !== todayStr) {
+    touchStreak(user);
+    await user.save();
+  }
+};
 
 router.post('/signup', async (req, res) => {
   try {
@@ -21,11 +31,16 @@ router.post('/signup', async (req, res) => {
       return res.status(409).json({ error: 'An account with this email already exists' });
 
     const user = await User.create({ name, email, password });
+    await touchStreakIfNewDay(user);
     const token = signToken(user._id);
 
     res.status(201).json({
       token,
-      user: { id: user._id, name: user.name, email: user.email, subscriptionStatus: user.subscriptionStatus }
+      user: {
+        id: user._id, name: user.name, email: user.email, subscriptionStatus: user.subscriptionStatus,
+        xp: user.xp, level: levelFromXp(user.xp), xpIntoLevel: xpIntoLevel(user.xp),
+        currentStreak: user.currentStreak, longestStreak: user.longestStreak
+      }
     });
   } catch (err) {
     console.error('Signup error:', err);
@@ -43,6 +58,7 @@ router.post('/login', async (req, res) => {
     if (!user || !(await user.comparePassword(password)))
       return res.status(401).json({ error: 'Invalid email or password' });
 
+    await touchStreakIfNewDay(user);
     const token = signToken(user._id, rememberMe ? '15d' : '1d');
 
     res.json({
@@ -52,7 +68,9 @@ router.post('/login', async (req, res) => {
         name: user.name,
         email: user.email,
         subscriptionStatus: user.subscriptionStatus,
-        subscriptionCurrentPeriodEnd: user.subscriptionCurrentPeriodEnd
+        subscriptionCurrentPeriodEnd: user.subscriptionCurrentPeriodEnd,
+        xp: user.xp, level: levelFromXp(user.xp), xpIntoLevel: xpIntoLevel(user.xp),
+        currentStreak: user.currentStreak, longestStreak: user.longestStreak
       }
     });
   } catch (err) {
@@ -62,6 +80,12 @@ router.post('/login', async (req, res) => {
 });
 
 router.get('/me', protect, async (req, res) => {
+  try {
+    await touchStreakIfNewDay(req.user);
+  } catch (err) {
+    console.error('Streak update error:', err.message);
+  }
+
   res.json({
     user: {
       id: req.user._id,
@@ -70,7 +94,12 @@ router.get('/me', protect, async (req, res) => {
       subscriptionStatus: req.user.subscriptionStatus,
       subscriptionCurrentPeriodEnd: req.user.subscriptionCurrentPeriodEnd,
       uploadsThisMonth: req.user.uploadsThisMonth,
-      hasActiveSubscription: req.user.hasActiveSubscription()
+      hasActiveSubscription: req.user.hasActiveSubscription(),
+      xp: req.user.xp,
+      level: levelFromXp(req.user.xp),
+      xpIntoLevel: xpIntoLevel(req.user.xp),
+      currentStreak: req.user.currentStreak,
+      longestStreak: req.user.longestStreak
     }
   });
 });
@@ -92,7 +121,12 @@ router.put('/me', protect, async (req, res) => {
         subscriptionStatus: req.user.subscriptionStatus,
         subscriptionCurrentPeriodEnd: req.user.subscriptionCurrentPeriodEnd,
         uploadsThisMonth: req.user.uploadsThisMonth,
-        hasActiveSubscription: req.user.hasActiveSubscription()
+        hasActiveSubscription: req.user.hasActiveSubscription(),
+        xp: req.user.xp,
+        level: levelFromXp(req.user.xp),
+        xpIntoLevel: xpIntoLevel(req.user.xp),
+        currentStreak: req.user.currentStreak,
+        longestStreak: req.user.longestStreak
       }
     });
   } catch (err) {
