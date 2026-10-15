@@ -250,7 +250,21 @@ export default function StudyPackView() {
   const [editing, setEditing] = useState(false);
   const [editTitle, setEditTitle] = useState('');
   const [editSubject, setEditSubject] = useState('');
-  const [editSaving, setEditSaving] = useState(false);
+    const [editSaving, setEditSaving] = useState(false);
+
+  const { setStudyPackContext } = useChatContext();
+
+  useEffect(() => {
+    if (pack) {
+      setStudyPackContext({
+        title: pack.title,
+        subject: pack.subject,
+        summary: pack.summary,
+        keyPoints: pack.keyPoints,
+      });
+    }
+    return () => setStudyPackContext(null);
+  }, [pack, setStudyPackContext]);
 
   useEffect(() => {
     api.getStudyPack(id)
