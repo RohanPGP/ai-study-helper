@@ -80,11 +80,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-  <ChatProvider>
-    {/* ...existing Router/Navbar/Routes/Footer... */}
-    <ChatWidget />
-  </ChatProvider>
-</AuthProvider>
+        <ChatProvider>
+          <AppRoutes />
+          <ChatWidget />
+        </ChatProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }
