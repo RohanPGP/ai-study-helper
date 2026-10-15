@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const rateLimit = require('express-rate-limit');
 const { protect } = require('../middleware/auth');
 const { getChatReply } = require('../utils/chatService');
 
@@ -20,11 +21,27 @@ You can also answer questions about how to use the TutorPulseAI website itself u
 Keep answers concise and easy to read in a small chat window (short paragraphs or bullet points, avoid walls of text). Do not use LaTeX notation (no \\frac, \\sqrt, etc.) - write math in plain text instead.
 ${SITE_FAQ}`;
 
-router.post('/', protect, async (req, res) => {
+// Keyed by logged-in user id (not IP) so one student can't use up a shared
+// school-network IP's quota and lock out classmates on the same network.
+const chatLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 20, // 20 messages per 10 minutes per student
+  keyGenerator: (req) => (req.user ? req.user.id : req.ip),
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "You're sending messages too quickly. Please wait a few minutes and try again." },
+});
+
+const MAX_MESSAGE_LENGTH = 2000;
+
+router.post('/', protect, chatLimiter, async (req, res) => {
   try {
     const { message, history, studyPack } = req.body;
     if (!message || typeof message !== 'string' || !message.trim()) {
       return res.status(400).json({ message: 'Message is required' });
+    }
+    if (message.length > MAX_MESSAGE_LENGTH) {
+      return res.status(400).json({ message: `Message is too long (max ${MAX_MESSAGE_LENGTH} characters).` });
     }
 
     let systemContent = BASE_PERSONA;
