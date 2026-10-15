@@ -68,5 +68,10 @@ export const api = {
   createShareLink: (id, showCreator) => request(`/history/${id}/share`, { method: 'POST', body: JSON.stringify({ showCreator }) }),
   revokeShareLink: (id) => request(`/history/${id}/share`, { method: 'DELETE' }),
 
-  getSharedPack: (token) => request(`/share/${token}`)
+  getSharedPack: (token) => request(`/share/${token}`),
+
+  chat: (message, history, studyPack) => request('/chat', {
+    method: 'POST',
+    body: JSON.stringify({ message, history, studyPack })
+  })
 };
