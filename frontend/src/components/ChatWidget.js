@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useChatContext } from '../contexts/ChatContext';
 import { api } from '../utils/api';
+import PulserIcon from './PulserIcon';
 
 export default function ChatWidget() {
   const { user } = useAuth();
@@ -47,12 +48,14 @@ export default function ChatWidget() {
     <>
       <button className="chat-fab" onClick={() => setOpen((o) => !o)} aria-label="Open Pulser chat">
         <span className="chat-fab-ring" />
-        {open ? '✕' : '⚡'}
+        {open ? '✕' : <PulserIcon size={26} />}
       </button>
       {open && (
         <div className="chat-panel">
           <div className="chat-panel-header">
-            <strong>⚡ Pulser</strong>
+            <strong style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <PulserIcon size={22} /> Pulser
+            </strong>
             {studyPackContext && <span className="chat-context-badge">Viewing: {studyPackContext.title}</span>}
           </div>
           <div className="chat-panel-messages">
