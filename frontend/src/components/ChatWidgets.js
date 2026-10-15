@@ -29,7 +29,8 @@ export default function ChatWidget() {
       const data = await api.chat(text, newMessages.slice(0, -1), studyPackContext);
       setMessages([...newMessages, { role: 'assistant', content: data.reply }]);
     } catch (err) {
-      setMessages([...newMessages, { role: 'assistant', content: "Sorry, I couldn't respond right now. Please try again." }]);
+      const limited = err?.status === 429 || /too quickly/i.test(err?.message || '');
+      setMessages([...newMessages, { role: 'assistant', content: limited ? "You're sending messages too quickly — give it a few minutes!" : "Sorry, I couldn't respond right now. Please try again." }]);
     } finally {
       setLoading(false);
     }
