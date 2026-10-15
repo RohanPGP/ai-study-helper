@@ -31,7 +31,11 @@ const userSchema = new mongoose.Schema({
   },
   subscriptionCurrentPeriodEnd: { type: Date, default: null },
   uploadsThisMonth: { type: Number, default: 0 },
-  lastUploadReset: { type: Date, default: Date.now }
+  lastUploadReset: { type: Date, default: Date.now },
+  xp: { type: Number, default: 0 },
+  currentStreak: { type: Number, default: 0 },
+  longestStreak: { type: Number, default: 0 },
+  lastActiveDate: { type: Date, default: null }
 }, { timestamps: true });
 
 // Hash password before save
