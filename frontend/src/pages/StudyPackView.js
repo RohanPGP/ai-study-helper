@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import { api } from '../utils/api';
 import { useChatContext } from '../contexts/ChatContext';
+import { useAuth } from '../hooks/useAuth';
 
 function fireConfetti() {
   const canvas = document.createElement('canvas');
@@ -120,7 +121,7 @@ function Flashcards({ cards }) {
   );
 }
 
-function Quiz({ questions }) {
+function Quiz({ questions, packId, onComplete }) {
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [retaking, setRetaking] = useState(false);
@@ -197,6 +198,10 @@ function Quiz({ questions }) {
             const finalScore = questions.filter((q, i) => answers[i] === q.correctIndex).length;
             setSubmitted(true);
             if (finalScore / questions.length >= 0.7) fireConfetti();
+            if (packId && onComplete) {
+              const percent = Math.round((finalScore / questions.length) * 100);
+              api.quizComplete(packId, percent).then(onComplete).catch(() => {});
+            }
           }}
           disabled={Object.keys(answers).length < questions.length}
         >
@@ -237,10 +242,13 @@ function Quiz({ questions }) {
 export default function StudyPackView() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user, refreshUser } = useAuth();
+  const { setStudyPackContext } = useChatContext();
   const [pack, setPack] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('summary');
   const [reprocessing, setReprocessing] = useState(false);
+  const [xpToast, setXpToast] = useState(null);
 
   const [shareToken, setShareToken] = useState(null);
   const [showCreator, setShowCreator] = useState(false);
@@ -250,9 +258,7 @@ export default function StudyPackView() {
   const [editing, setEditing] = useState(false);
   const [editTitle, setEditTitle] = useState('');
   const [editSubject, setEditSubject] = useState('');
-    const [editSaving, setEditSaving] = useState(false);
-
-  const { setStudyPackContext } = useChatContext();
+  const [editSaving, setEditSaving] = useState(false);
 
   useEffect(() => {
     if (pack) {
@@ -276,6 +282,13 @@ export default function StudyPackView() {
       .catch(() => navigate('/dashboard'))
       .finally(() => setLoading(false));
   }, [id, navigate]);
+
+  const handleXpAward = async (data) => {
+    const prevLevel = user?.level || 1;
+    await refreshUser();
+    setXpToast({ amount: data.xpAwarded, leveledUp: data.level > prevLevel, newLevel: data.level });
+    setTimeout(() => setXpToast(null), 4000);
+  };
 
   const handleReprocess = async () => {
     if (!window.confirm('Regenerate this study pack using AI? This will overwrite the current content.')) return;
@@ -408,6 +421,11 @@ export default function StudyPackView() {
 
   return (
     <div className="page">
+      {xpToast && (
+        <div className="xp-toast">
+          {xpToast.leveledUp ? `🎉 Level Up! You're now Level ${xpToast.newLevel}` : `+${xpToast.amount} XP earned!`}
+        </div>
+      )}
       <div className="container" style={{ maxWidth: 800 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
           <div style={{ flex: 1, minWidth: 240 }}>
@@ -482,7 +500,7 @@ export default function StudyPackView() {
         {activeTab === 'summary' && <Summary text={pack.summary} />}
         {activeTab === 'keypoints' && <KeyPoints points={pack.keyPoints || []} />}
         {activeTab === 'flashcards' && <Flashcards cards={pack.flashcards || []} />}
-        {activeTab === 'quiz' && <Quiz questions={pack.quiz || []} />}
+        {activeTab === 'quiz' && <Quiz questions={pack.quiz || []} packId={id} onComplete={handleXpAward} />}
       </div>
     </div>
   );
