@@ -29,7 +29,7 @@ const chatLimiter = rateLimit({
   keyGenerator: (req) => (req.user ? req.user.id : req.ip),
   standardHeaders: true,
   legacyHeaders: false,
-  message: { message: "You're sending messages too quickly. Please wait a few minutes and try again." },
+  message: { error: "You're sending messages too quickly. Please wait a few minutes and try again." },
 });
 
 const MAX_MESSAGE_LENGTH = 2000;
@@ -38,10 +38,10 @@ router.post('/', protect, chatLimiter, async (req, res) => {
   try {
     const { message, history, studyPack } = req.body;
     if (!message || typeof message !== 'string' || !message.trim()) {
-      return res.status(400).json({ message: 'Message is required' });
+      return res.status(400).json({ error: 'Message is required' });
     }
     if (message.length > MAX_MESSAGE_LENGTH) {
-      return res.status(400).json({ message: `Message is too long (max ${MAX_MESSAGE_LENGTH} characters).` });
+      return res.status(400).json({ error: `Message is too long (max ${MAX_MESSAGE_LENGTH} characters).` });
     }
 
     let systemContent = BASE_PERSONA;
@@ -60,7 +60,7 @@ router.post('/', protect, chatLimiter, async (req, res) => {
     res.json({ reply });
   } catch (err) {
     console.error('Chat error:', err.message);
-    res.status(500).json({ message: 'Failed to get a response. Please try again.' });
+    res.status(500).json({ error: 'Failed to get a response. Please try again.' });
   }
 });
 
