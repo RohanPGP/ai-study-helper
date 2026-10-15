@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
+import { ChatProvider } from './contexts/ChatContext';
+import ChatWidget from './components/ChatWidget';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -78,8 +80,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
+  <ChatProvider>
+    {/* ...existing Router/Navbar/Routes/Footer... */}
+    <ChatWidget />
+  </ChatProvider>
+</AuthProvider>
     </BrowserRouter>
   );
 }
