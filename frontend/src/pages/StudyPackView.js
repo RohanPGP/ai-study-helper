@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import { api } from '../utils/api';
+import { useChatContext } from '../contexts/ChatContext';
 
 function fireConfetti() {
   const canvas = document.createElement('canvas');
