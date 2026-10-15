@@ -67,11 +67,7 @@ export const api = {
   deleteStudyPack: (id) => request(`/history/${id}`, { method: 'DELETE' }),
   createShareLink: (id, showCreator) => request(`/history/${id}/share`, { method: 'POST', body: JSON.stringify({ showCreator }) }),
   revokeShareLink: (id) => request(`/history/${id}/share`, { method: 'DELETE' }),
+  quizComplete: (id, scorePercent) => request(`/history/${id}/quiz-complete`, { method: 'POST', body: JSON.stringify({ scorePercent }) }),
 
-  getSharedPack: (token) => request(`/share/${token}`),
-
-  chat: (message, history, studyPack) => request('/chat', {
-    method: 'POST',
-    body: JSON.stringify({ message, history, studyPack })
-  })
+  getSharedPack: (token) => request(`/share/${token}`)
 };
