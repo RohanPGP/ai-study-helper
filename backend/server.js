@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-
+const chatRoutes = require("./routes/chat");
 const authRoutes = require('./routes/auth');
 const paymentRoutes = require('./routes/payment');
 const uploadRoutes = require('./routes/upload');
