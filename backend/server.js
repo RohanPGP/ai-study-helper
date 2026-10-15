@@ -63,7 +63,7 @@ app.use('/process', processRoutes);
 app.use('/email', emailRoutes);
 app.use('/history', historyRoutes);
 app.use('/share', shareRoutes);
-
+app.use("/chat", chatRoutes);
 // ── Global error handler ───────────────────────────────────────────────────────
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err.message);
