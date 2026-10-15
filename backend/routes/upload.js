@@ -3,6 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const os = require('os');
 const StudyPack = require('../models/StudyPack');
+const User = require('../models/User');
 const { protect, requireSubscription } = require('../middleware/auth');
 const { extractText } = require('../utils/fileExtractor');
 const { extractTextFromImages } = require('../utils/ocrService');
@@ -84,6 +85,7 @@ router.post('/', protect, requireSubscription, upload.single('file'), async (req
         quiz: aiResult.quiz || [],
         status: 'ready'
       });
+      await User.findByIdAndUpdate(req.user._id, { $inc: { xp: 15 } });
     } catch (err) {
       console.error('Processing error for pack', pack._id, err.message);
       await StudyPack.findByIdAndUpdate(pack._id, {
@@ -138,6 +140,7 @@ router.post('/camera', protect, requireSubscription, imageUpload.array('images',
         quiz: aiResult.quiz || [],
         status: 'ready'
       });
+      await User.findByIdAndUpdate(req.user._id, { $inc: { xp: 15 } });
     } catch (err) {
       console.error('Camera processing error for pack', pack._id, err.message);
       await StudyPack.findByIdAndUpdate(pack._id, {
