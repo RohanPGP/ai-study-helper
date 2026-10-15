@@ -51,7 +51,7 @@ export default function ChatWidget() {
       {open && (
         <div className="chat-panel">
           <div className="chat-panel-header">
-            <strong>Study Assistant</strong>
+            <strong>Pulser</strong>
             {studyPackContext && <span className="chat-context-badge">Viewing: {studyPackContext.title}</span>}
           </div>
           <div className="chat-panel-messages">
