@@ -1,7 +1,9 @@
 const router = require('express').Router();
 const crypto = require('crypto');
 const StudyPack = require('../models/StudyPack');
+const User = require('../models/User');
 const { protect } = require('../middleware/auth');
+const { levelFromXp, xpIntoLevel } = require('../utils/gamification');
 
 router.get('/', protect, async (req, res) => {
   try {
@@ -104,6 +106,33 @@ router.delete('/:id/share', protect, async (req, res) => {
     res.json({ message: 'Sharing disabled' });
   } catch (err) {
     res.status(500).json({ error: 'Failed to revoke share link' });
+  }
+});
+
+// POST /history/:id/quiz-complete — award XP for finishing a quiz
+router.post('/:id/quiz-complete', protect, async (req, res) => {
+  try {
+    const pack = await StudyPack.findOne({ _id: req.params.id, userId: req.user._id });
+    if (!pack) return res.status(404).json({ error: 'Study pack not found' });
+
+    const scorePercent = req.body.scorePercent;
+    let xpAwarded = 10;
+    if (typeof scorePercent === 'number' && scorePercent >= 70) xpAwarded += 15;
+
+    const updated = await User.findByIdAndUpdate(
+      req.user._id,
+      { $inc: { xp: xpAwarded } },
+      { new: true }
+    );
+
+    res.json({
+      xpAwarded,
+      xp: updated.xp,
+      level: levelFromXp(updated.xp),
+      xpIntoLevel: xpIntoLevel(updated.xp)
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to record quiz completion' });
   }
 });
 
